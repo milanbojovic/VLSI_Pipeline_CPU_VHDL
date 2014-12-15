@@ -1,0 +1,16 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity ADDER is
+	port(
+		-- Input port
+		a: in REG_TYPE;
+		
+		-- Output port
+		z: out REG_TYPE;
+	)
+end entity ADDER;
+
+architecture BEH of ADDER is
+begin
+end architecture BEH;

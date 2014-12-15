@@ -1,0 +1,19 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use WORK.cpu_lib.all;
+
+entity ALU is
+	
+	generic(
+			OP_CODE_LENGTH : unsigned := 4
+	)
+	
+	port(
+			reset : in std_logic;
+			op_code: in unsigned ((OP_CODE_LENGTH - 1) downto 0);
+			src_1 : in unsigned ((WORD - 1) downto 0);
+	);
+end entity ALU;
+
+

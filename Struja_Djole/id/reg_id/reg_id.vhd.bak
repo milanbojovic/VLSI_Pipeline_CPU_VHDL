@@ -1,0 +1,14 @@
+library ieee;
+library work;
+
+use ieee.std_logic_1164.all;
+use work.cpu_lib.all;
+
+entity REG_ID is
+	port(
+	);
+end entity REG_ID;
+
+architecture BHV of REG_ID is
+begin
+endd architecture;

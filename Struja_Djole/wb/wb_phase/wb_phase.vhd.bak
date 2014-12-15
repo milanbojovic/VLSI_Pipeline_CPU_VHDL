@@ -1,0 +1,50 @@
+library IEEE;
+
+use IEEE.STD_LOGIC_1164.all;
+
+entity WB_PHASE is
+	port(
+		signal clk: STD_LOGIC;
+        signal reset: STD_LOGIC;
+
+        -- MEM_PHASE
+        instruction_type :  INSTRUCTION_TYPE_TYPE;
+        load_store: STD_LOGIC;
+        Rd: REG_TYPE;
+        RdAddr :REG_ADDR_TYPE;
+
+        -- ID_PHASE
+        RdAddr_out : out REG_ADDR_TYPE;
+        Rd_out : out REG_TYPE
+        we : out STD_LOGIC
+	);
+end entity WB_PHASE;
+
+architecture STR of WB_PHASE is
+	--component MUX_2_IN_1 is
+			--port
+			--(
+				--a	: in  REG_TYPE;
+				--b	: in  REG_TYPE;
+				--sel: in  std_logic;
+
+				--z	: out REG_TYPE
+			--);
+	--end component;
+begin
+	process(clk) is
+	begin
+		if(rising_edge(clk)) then
+			if(instruction_type = INSTRUCTION_TYPE_DP_R
+				or
+				instruction_type = INSTRUCTION_TYPE_DP_I
+				or
+				instruction_type = INSTRUCTION_TYPE_L_S and load_store = '1') then
+					Rd_out <= Rd;
+					RdAddr_out <= RdAddr;
+					we <= '1';
+			end if;
+		end if;
+	end process;
+
+end architecture STR;

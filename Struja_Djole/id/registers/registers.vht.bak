@@ -1,0 +1,118 @@
+-- Copyright (C) 1991-2014 Altera Corporation. All rights reserved.
+-- Your use of Altera Corporation's design tools, logic functions 
+-- and other software and tools, and its AMPP partner logic 
+-- functions, and any output files from any of the foregoing 
+-- (including device programming or simulation files), and any 
+-- associated documentation or information are expressly subject 
+-- to the terms and conditions of the Altera Program License 
+-- Subscription Agreement, the Altera Quartus II License Agreement,
+-- the Altera MegaCore Function License Agreement, or other 
+-- applicable license agreement, including, without limitation, 
+-- that your use is for the sole purpose of programming logic 
+-- devices manufactured by Altera and sold by Altera or its 
+-- authorized distributors.  Please refer to the applicable 
+-- agreement for further details.
+
+-- ***************************************************************************
+-- This file contains a Vhdl test bench template that is freely editable to   
+-- suit user's needs .Comments are provided in each section to help the user  
+-- fill out necessary details.                                                
+-- ***************************************************************************
+-- Generated on "08/03/2014 20:51:40"
+                                                            
+-- Vhdl Test Bench template for design  :  REGISTERS
+-- 
+-- Simulation tool : ModelSim-Altera (VHDL)
+-- 
+
+LIBRARY ieee;                                               
+USE ieee.std_logic_1164.all;
+USE ieee.numeric_std.all;                                
+
+ENTITY REGISTERS_vhd_tst IS
+END REGISTERS_vhd_tst;
+ARCHITECTURE REGISTERS_arch OF REGISTERS_vhd_tst IS
+-- constants                                                 
+-- signals                                                   
+SIGNAL clk : STD_LOGIC;
+SIGNAL PCin : STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL PCout : STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL Rd : STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL RdAddr : STD_LOGIC_VECTOR(3 DOWNTO 0);
+SIGNAL Rm : STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL RmAddr : STD_LOGIC_VECTOR(3 DOWNTO 0);
+SIGNAL Rn : STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL RnAddr : STD_LOGIC_VECTOR(3 DOWNTO 0);
+SIGNAL Rs : STD_LOGIC_VECTOR(31 DOWNTO 0);
+SIGNAL RsAddr : STD_LOGIC_VECTOR(3 DOWNTO 0);
+SIGNAL we : STD_LOGIC;
+COMPONENT REGISTERS
+	PORT (
+	clk : IN STD_LOGIC;
+	PCin : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+	PCout : BUFFER STD_LOGIC_VECTOR(31 DOWNTO 0);
+	Rd : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+	RdAddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+	Rm : BUFFER STD_LOGIC_VECTOR(31 DOWNTO 0);
+	RmAddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+	Rn : BUFFER STD_LOGIC_VECTOR(31 DOWNTO 0);
+	RnAddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+	Rs : BUFFER STD_LOGIC_VECTOR(31 DOWNTO 0);
+	RsAddr : IN STD_LOGIC_VECTOR(3 DOWNTO 0);
+	we : IN STD_LOGIC
+	);
+END COMPONENT;
+BEGIN
+	i1 : REGISTERS
+	PORT MAP (
+-- list connections between master ports and signals
+	clk => clk,
+	PCin => PCin,
+	PCout => PCout,
+	Rd => Rd,
+	RdAddr => RdAddr,
+	Rm => Rm,
+	RmAddr => RmAddr,
+	Rn => Rn,
+	RnAddr => RnAddr,
+	Rs => Rs,
+	RsAddr => RsAddr,
+	we => we
+	);
+                                           
+init : PROCESS 
+	variable i : integer := 0;
+	variable addition : std_LOGIC_VECTOR(27 downto 0) := (others => '0');                                             
+BEGIN                                                         
+	wait for 1 ns;
+
+	i := (i + 1) mod 16;
+
+	we <= '1';
+
+	RdAddr <= STD_LOGIC_VECTOR(to_unsigned(i, RdAddr'length));
+	Rd <= STD_LOGIC_VECTOR(TO_UNSIGNED(i, Rd'length));
+	PCin <= STD_LOGIC_VECTOR(TO_UNSIGNED(i + 1, PCin'length));
+
+	if (RdAddr = "1111") then
+		assert PCout = addition & RdAddr
+		report "PC is not programmatically changed, but it should be"
+		severity warning;
+	else
+		assert PCout = PCin
+		report "PC is not loaded from PCin, but it should be"
+		severity warning;
+	end if;
+	
+	wait for 1 ns;  
+END PROCESS init;
+
+clk_p : PROCESS
+BEGIN
+	clk <= '0';
+	wait for 1 ns;
+	
+	clk <= '1';
+	wait for 1 ns;
+END PROCESS clk_p                                          
+END REGISTERS_arch;

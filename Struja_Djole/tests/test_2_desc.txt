@@ -1,0 +1,21 @@
+
+00000100 PC = 100h
+00000000 //ignorise se za procesor sa jednim jezgrom
+
+00111010000000100000000000000111  | DP - Immediate | Move | R0 | R2 | Signed operation | 0000000000000111
+00111010000001000000000000000101  | DP - Immediate | Move | R0 | R1 | Signed operation | 0000000000000101
+00010000000000100010000001100000  | DP - Register | Swap of register values | R0 | R1 | Signed operation | R2 | R0 | Shift | No Shift
+00000100010001010001000001100000  | DP - Register | Subtract | R2 | R2 | Unsigned | R1 | R0 | Shift | No Shift 
+00001010001000110010000001100000  | DP - Register | Addition with carry bit | R1 | R1 | Unsigned operation | R2 | R0 | Shift | No Shift
+00111010001001110000000000000010  | DP - Immediate | Move of the second operand | R1 | R3 | Unsigned operation | 0000000000000010
+00000100001000110011000001100000  | DP - Register | Subtract | R1 | R1 | Unsigned operation | R3 | R0 | Shift | No Shift
+10000100000000000000000000000101  | Jump Instructions | Equal | Branch and link | 00000000000000000000000101
+00101000001000100000000000000001  | DP - Immediate | Addition | R1 | R1 | Signed operation | 0000000000000001
+00110100001000100000000000000000  | DP - Immediate | Comparison | R1 | R1 | Signed operation | 0000000000000000
+10001011111111111111111111111011  | Jump Instructions | Signed Greater | Simple Branch | 11111111111111111111111011
+00101000001000100000000000000001  | DP - Immediate | Addition | R1 | R1 | Signed operation | 0000000000000001
+10011000000000000000000000000010  | Jump Instructions | Unconditional | Simple Branch | 00000000000000000000000010
+01000000001001000000000000000000  | Load/Store | Store | R1 | R2
+00011010001111101110000001100000  | DP - Register | Move of the second operand | R1 | PC | Signed operation | LINK | R0 | Shift | No Shift
+01000000001001000000000000000000  | Load/Store | Store | R1 | R2
+10100000000000000000000000000000  | Stop Instruction

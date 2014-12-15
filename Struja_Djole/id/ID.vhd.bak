@@ -1,0 +1,13 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity ID_phase is
+	port(
+		signal clk: in std_logic;
+	);
+end entity ID_phase;
+
+architecture STR of ID is
+	
+end architecture STR;
+

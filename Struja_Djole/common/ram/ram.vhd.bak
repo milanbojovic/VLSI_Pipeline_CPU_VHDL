@@ -1,0 +1,79 @@
+-- Quartus II VHDL Template
+-- Single-port RAM with single read/write address and initial contents	
+
+library IEEE;
+library WORK;
+
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+
+use WORK.CPU_LIB.all;
+
+entity RAM is
+
+	generic 
+	(
+		ADDR_WIDTH : NATURAL := 6
+	);
+
+	port 
+	(
+		-- Input ports
+		clk		: STD_LOGIC;
+		addr	: ADDR_TYPE;
+		we		: STD_LOGIC := '1';
+		data_in	: in WORD_TYPE;
+
+		-- Output ports
+		data_out : out WORD_TYPE
+	);
+
+end RAM;
+
+architecture RTL of RAM is
+
+	-- Build a 2-D array type for the RAM
+
+	type MEMORY_TYPE is array(2**ADDR_WIDTH-1 downto 0) of WORD_TYPE;
+
+	function init_ram
+		return MEMORY_TYPE is 
+		variable tmp : MEMORY_TYPE := (others => (others => '0'));
+	begin 
+		for addr_pos in 0 to 2**ADDR_WIDTH - 1 loop 
+			-- Initialize each address with the address itself
+			tmp(addr_pos) := STD_LOGIC_VECTOR(TO_UNSIGNED(addr_pos, WORD_WIDTH));
+		end loop;
+		return tmp;
+	end;	 
+
+	-- Declare the RAM signal and specify a default value.	Quartus II
+	-- will create a memory initialization file (.mif) based on the 
+	-- default value.
+	signal ram : MEMORY_TYPE;
+	signal ram_next : MEMORY_TYPE := init_ram;
+
+	-- Register to hold the address 
+	signal addr_reg : NATURAL range 0 to 2**ADDR_WIDTH-1;
+
+begin
+
+	process(clk)
+	begin
+		if(rising_edge(clk)) then
+			ram <= ram_next;	
+		end if ; 
+	end process
+
+	process(we, addr, data_in)
+	begin
+			-- Register the address for reading
+			addr_reg <= TO_INTEGER(UNSIGNED(addr(ADDR_WIDTH - 1 downto 0)));
+
+			if (we = '1') then
+				ram(addr_reg) <= data_in;
+			end if;
+
+		data_out <= ram(addr_reg);
+	end process;
+end RTL;

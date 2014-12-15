@@ -1,0 +1,43 @@
+library ieee;
+library work;
+
+use ieee.std_logic_1164.all;
+use work.cpu_lib.all;
+
+entity REG_WB_OUT is
+	port(
+	
+		-- Input ports
+		load : STD_LOGIC;
+		reset: STD_LOGIC;
+		
+		we_in					: STD_LOGIC;
+		rd_in					: REG_TYPE;
+		rd_addr_in				: REG_ADDR_TYPE;
+		
+		-- Output ports
+		instruction_type_out 	: out INSTRUCTION_TYPE_TYPE;
+		load_store_out			: out STD_LOGIC;
+		rd_out					: out REG_TYPE;
+		rd_addr_out				: out REG_ADDR_TYPE
+	);
+end entity;
+architecture BHV of REG_WB_OUT is
+begin
+	process(load) is
+	begin
+		if(rising_edge(load)) then
+			if(reset = '1')then
+				instruction_type_out <= INSTRUCTION_TYPE_NOOP;
+				load_store_out <= '0';
+				rd_out <= (others => '0'); 
+				rd_addr_out <= (others => '0');
+			else
+				instruction_type_out <= instruction_type_in;
+				load_store_out <= load_store_in;
+				rd_out <= rd_in; 
+				rd_addr_out <= rd_addr_in;
+			end if;
+		end if;
+	end process;
+end architecture BHV;

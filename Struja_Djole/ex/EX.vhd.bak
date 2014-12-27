@@ -1,0 +1,12 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity EX_phase is
+	port(
+		signal clk: in std_logic;
+	);
+end entity EX_phase;
+
+architecture STR of EX_phase is
+	
+end architecture STR;

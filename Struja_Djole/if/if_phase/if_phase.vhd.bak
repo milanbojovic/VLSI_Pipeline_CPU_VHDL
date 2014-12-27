@@ -1,0 +1,57 @@
+library IEEE;
+library WORK;
+
+use IEEE.STD_LOGIC_1164.all;
+
+use WORK.CPU_LIB.all;
+
+entity IF_PHASE is
+    port(
+		-- CONTROL
+		clk		: STD_LOGIC;
+		reset	: STD_LOGIC;
+
+		-- MEMORY
+		we 		: out STD_LOGIC;
+		addr 	: out WORD_TYPE;
+		data 	: inout WORD_TYPE;
+
+		-- ID_PHASE
+		id_pc 			: REG_TYPE;
+		pc_id 			: out REG_TYPE;
+		instruction_id 	: out REG_TYPE;
+
+		-- EX_PHASE
+		ex_pc		: REG_TYPE;
+		ex_branch 	: STD_LOGIC := '0'
+	);
+end entity IF_PHASE;
+
+architecture STR of IF_PHASE is
+
+	component ADDER is
+		port(
+			input: in REG_TYPE;
+			output: out REG_TYPE
+		);
+	end component;
+
+begin
+U_ADD : ADDER 	port map (
+						output => pc_id,
+						input => id_pc                                                       
+					);
+
+read_instuction: process (clk)
+	begin
+		-- stvara dodatni takt kasnjenja pri prenosu data u instruction
+		if (rising_edge(clk)) then
+			instruction_id <= data;
+		end if;
+	end process;
+
+	addr <= id_pc when ex_branch = '0' else ex_pc;
+	we <= '0';
+	data <= HIGH_Z_32;
+
+end architecture STR;

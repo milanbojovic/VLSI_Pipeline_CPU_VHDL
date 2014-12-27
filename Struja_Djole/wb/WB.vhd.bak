@@ -1,0 +1,12 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity WB_phase is
+	port(
+		signal clk: in std_logic;
+	);
+end entity WB_phase;
+
+architecture STR of WB_phase is
+	
+end architecture wb_behav;

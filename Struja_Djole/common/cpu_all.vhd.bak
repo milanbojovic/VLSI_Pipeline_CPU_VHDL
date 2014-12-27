@@ -1,0 +1,17 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use WORK.cpu_lib.all;
+
+
+entity CPU_ALL is
+	port(
+		signal clk: in std_logic;
+		signal reset : in std_logic;
+		signal address_bus : inout std_logic_vector((ADDRESS_WIDTH - 1) downto 0);
+		signal data_bus : inout std_logic_vector((DATA_WIDTH - 1) downto 0);
+	);
+end entity CPU_ALL;
+
+architecture STR of IF is
+	
+end architecture STR;

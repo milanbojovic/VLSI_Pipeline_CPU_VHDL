@@ -5,4 +5,15 @@
 *.qpf
 *.swp
 *.ddb
+*.do
+*.wlf
+*.cr.mti
+*.mpf
+*.mpf
+*.rpt
 /db/*
+/output_files/*
+/incremental_db/*
+/work/*
+/simulation/*
+transcript

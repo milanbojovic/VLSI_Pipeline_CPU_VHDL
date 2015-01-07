@@ -1,6 +1,10 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.all;
-use IEEE.STD_LOGIC_ARITH.all;
+--use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_TEXTIO.all;
+use IEEE.numeric_std.all;
+use STD.TEXTIO.all;
+
 
 package cpu_lib is
 
@@ -12,7 +16,7 @@ package cpu_lib is
 	constant SP_ADDR					: NATURAL 	:= 30;
 	constant LINK_ADDR				: NATURAL 	:= 31;
 	constant PHASE_DURATION 		: NATURAL 	:= 8;
-	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8;
+	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;
 		
 	subtype OPCODE_TYPE 				is STD_LOGIC_VECTOR(4 downto 0);
 --	subtype SHIFT_TYPE_TYPE 		is STD_LOGIC_VECTOR(1 downto 0);
@@ -75,13 +79,13 @@ package cpu_lib is
 --	constant S_SIGNED    : STD_LOGIC := '1'; -- Signed operation
 --	constant S_UNSIGNED  : STD_LOGIC := '0'; -- Unsigned operation
 
+	constant MAX_32 : STD_LOGIC_VECTOR(31 downto 0)		:= (others => '1');
+	constant MAX_16 : STD_LOGIC_VECTOR(15 downto 0)		:= (others => '1');
+	constant MAX_6  : STD_LOGIC_VECTOR(5 downto 0)		:= (others => '1');
 
---	constant MAX_16 : STD_LOGIC_VECTOR(15 downto 0)		:= (others => '1');
---	constant MAX_6 : STD_LOGIC_VECTOR(5 downto 0)		:= (others => '1');
-
---	constant ZERO_16 : STD_LOGIC_VECTOR(15 downto 0)	:= (others => '0');
---	constant ZERO_6 : STD_LOGIC_VECTOR(5 downto 0)		:= (others => '0');
---	constant ZERO_32 : STD_LOGIC_VECTOR(31 downto 0)	:= (others => '0');
+	constant ZERO_16 : STD_LOGIC_VECTOR(15 downto 0)	:= (others => '0');
+	constant ZERO_6 : STD_LOGIC_VECTOR(5 downto 0)		:= (others => '0');
+	constant ZERO_32 : STD_LOGIC_VECTOR(31 downto 0)	:= (others => '0');
 
 --	constant HIGH_Z_32 : STD_LOGIC_VECTOR(31 downto 0)	:= (others => 'Z');
 
@@ -90,17 +94,44 @@ package cpu_lib is
 	constant input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/input.txt";
 --	constant output_file				: STRING := "test_2_out.txt";
 	--constant output_file			: STRING := "D:\altera\VLSI_VHDL\simulation\modelsim\test_1_out.txt";
+	
+	function read_pc_from_file return REG_TYPE;
+	function read_pc_plus_one_from_file return REG_TYPE;
 end cpu_lib;
 
 package body cpu_lib is
---	function LOG2 (count : POSITIVE) return POSITIVE is
---		variable cnt,tmp : POSITIVE;
---	begin
---		cnt := count;
---		while cnt > 1 loop
---			tmp := tmp + 1;
---			cnt := cnt / 2;
---		end loop;
---		return tmp;
---	end;
+	
+	function read_pc_plus_one_from_file return REG_TYPE is 
+		file 		input_file		: text;
+		variable input_line		: line;
+		variable pc_value			: WORD_TYPE;  -- pc from file
+	begin
+		
+		file_open(input_file, input_file_path, read_mode);
+
+		READLINE(input_file, input_line);  	--Read the line from the file
+		HREAD(input_line, pc_value);		--Read first word (pc adress)
+
+		file_close(input_file);
+		
+		return std_logic_vector(UNSIGNED(pc_value) + 1);
+	end;
+
+	function read_pc_from_file return REG_TYPE is 
+		file 		input_file		: text;
+		variable input_line1		: line;
+		variable pc_value1			: WORD_TYPE;  -- pc from file
+	begin
+		
+		file_open(input_file, input_file_path, read_mode);
+
+		READLINE(input_file, input_line1);  	--Read the line from the file
+		HREAD(input_line1, pc_value1);		--Read first word (pc adress)
+
+		file_close(input_file);
+		return pc_value1;
+	end;	
+	
+	
+	
 end cpu_lib;

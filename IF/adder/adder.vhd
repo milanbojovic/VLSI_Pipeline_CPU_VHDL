@@ -16,10 +16,10 @@ entity ADDER is
 	);
 end entity ADDER;
 
-architecture BHV of ADDER is
+architecture arch of ADDER is
 begin
 	process(input) is
 	begin
 		output <= signed(input) + 1;
 	end process;
-end architecture BHV;
+end architecture arch;

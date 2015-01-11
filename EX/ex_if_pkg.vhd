@@ -6,7 +6,7 @@ package EX_IF_PKG is
 	-- Record for one way conection (IF --> ID)
 	type EX_IF_RCD is record
 		pc				: REG_TYPE;
-		branch_cond	: STD_LOGIC;
+		branch_cond	: MUX_SELECT_TYPE;
 	end record;
 
 end package EX_IF_PKG;

@@ -58,12 +58,11 @@ architecture arch of INSTRUCTION_CACHE is
 	shared variable instr_cache: CACHE_TYPE := init_cache;
 	
 begin	
-	
 	-- Checking control lines:
 	-- 001 - Take address from line address1 and return instruction on data1
 	-- 010 - Take address from line address2 and return instruction on data2
 	-- 011 - Take address from line address1 and address2 and return instruction on data1 and data2			
-			
+	
 	adr1: process(record_in_crls.clk, control)
 	begin
 		if (rising_edge(record_in_crls.clk) AND control = "001") OR (rising_edge(record_in_crls.clk) AND control = "011") then

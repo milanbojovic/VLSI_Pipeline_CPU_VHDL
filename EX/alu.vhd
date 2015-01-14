@@ -3,53 +3,43 @@ library IEEE;
 library WORK;
 
 use IEEE.STD_LOGIC_1164.all;
---use WORK.CPU_PKG.all;
+use WORK.CPU_PKG.all;
 use WORK.CPU_LIB.all;
---use IEEE.NUMERIC_STD.all;
 use IEEE.STD_LOGIC_ARITH.all;
-
-
-
--- clk : clock signal
--- reset : reset signal
+--use IEEE.NUMERIC_STD.all;
 
 -- opcode : operation code check cpu_lib for more details
--- is_signed : tells if operation should be done in signed mode or note (1 - signed, 0 - unsigned)
-
 -- a : value of the first operand
 -- b : value of the second operand
 -- carry_in: value of the carry flag from previos operation
-
--- result : result of operation
-
+-- zero_in			-- || --
+-- overflow_in		-- || --
+-- negative_in		-- || --
 -- carry_out : carry exists
 -- overflow : signed operation overflow happend
 -- negative : result is negative
 -- zero : result equals zero
+-- result : result of operation
 
 entity ALU is
 	port(
-			-- input ports
-			clk: in STD_LOGIC;
-
 			opcode: in OPCODE_TYPE;
-			is_signed : in STD_LOGIC;
-
 			a : in REG_TYPE;
 			b : in REG_TYPE;
 
-			carry_in 	 : STD_LOGIC 	:= '0';
-			zero_in 	 : STD_LOGIC 	:= '0';
-			overflow_in : STD_LOGIC 	:= '0';
-			negative_in : STD_LOGIC 	:= '0';
+			negative_in : SIGNAL_BIT_TYPE 	:= '0';
+			carry_in 	: SIGNAL_BIT_TYPE 	:= '0';
+			overflow_in : SIGNAL_BIT_TYPE 	:= '0';
+			zero_in 	 	: SIGNAL_BIT_TYPE 	:= '0';			
 
 			-- output ports
-			result : out REG_TYPE;
+			result 		: out REG_TYPE;
 
-			carry_out: out STD_LOGIC;
-			zero_out 	 : out STD_LOGIC;
-			overflow_out : out STD_LOGIC;
-			negative_out : out STD_LOGIC
+			negative_out: out SIGNAL_BIT_TYPE;
+			carry_out	: out SIGNAL_BIT_TYPE;
+			overflow_out: out SIGNAL_BIT_TYPE;
+			zero_out 	: out SIGNAL_BIT_TYPE
+			
 	);
 
 end entity ALU;
@@ -57,7 +47,7 @@ end entity ALU;
 architecture arch of ALU is
 
 	shared variable result_out : REG_TYPE;
-	shared variable carry, overflow, negative, zero: STD_LOGIC;
+	shared variable carry, overflow, negative, zero: SIGNAL_BIT_TYPE;
 
 	-- logical and operation
 	function DO_AND(a, b : REG_TYPE)	return REG_TYPE is
@@ -79,13 +69,13 @@ architecture arch of ALU is
 	end DO_ADD_U;
 
 	-- unsigned add operation with cary flag
-	function DO_ADC_U(a, b : REG_TYPE; carry : in STD_LOGIC)	return REG_TYPE is
+	function DO_ADC_U(a, b : REG_TYPE; carry : in SIGNAL_BIT_TYPE)	return REG_TYPE is
 	begin
 		return unsigned(a) + unsigned(b) + carry;
 	end DO_ADC_U;
 
 	-- unsigned sub operation with cary flag
-	function DO_SBC_U(a, b : REG_TYPE; carry : in STD_LOGIC) return REG_TYPE is
+	function DO_SBC_U(a, b : REG_TYPE; carry : in SIGNAL_BIT_TYPE) return REG_TYPE is
 	begin
 		return unsigned(a) - unsigned(b) - carry;
 	end DO_SBC_U;
@@ -108,13 +98,13 @@ architecture arch of ALU is
 	end DO_ADD_S;
 
 	-- signed add operation with cary flag
-	function DO_ADC_S(a, b : REG_TYPE; carry : in STD_LOGIC)	return REG_TYPE is
+	function DO_ADC_S(a, b : REG_TYPE; carry : in SIGNAL_BIT_TYPE)	return REG_TYPE is
 	begin
 		return signed(a) + signed(b) + carry;
 	end DO_ADC_S;
 
 	-- signed sub operation with cary flag
-	function DO_SBC_S(a, b : REG_TYPE; carry : in STD_LOGIC) return REG_TYPE is
+	function DO_SBC_S(a, b : REG_TYPE; carry : in SIGNAL_BIT_TYPE) return REG_TYPE is
 	begin
 		return signed(a) - signed(b) - carry;
 	end DO_SBC_S;
@@ -139,11 +129,16 @@ architecture arch of ALU is
 	begin
 		return signed(b) - '0';
 	end DO_SMOV;
+	
+	function DO_LOAD_STORE(a : REG_TYPE) return REG_TYPE is
+	begin
+		return unsigned(a) - '0';
+	end DO_LOAD_STORE;
 
 	procedure SET_FLAGS(a, b, result : REG_TYPE;
 						opcode 	: OPCODE_TYPE;
-						overflow_out, zero_out, negative_out, carry_out : out STD_LOGIC) is
-		variable msb_a, msb_b, msb_res: STD_LOGIC;
+						overflow_out, zero_out, negative_out, carry_out : out SIGNAL_BIT_TYPE) is
+		variable msb_a, msb_b, msb_res: SIGNAL_BIT_TYPE;
 		variable ext_a, ext_b, ext_result : STD_LOGIC_VECTOR (32 downto 0);
 	begin
 		msb_a := a(REG_TYPE'length - 1);
@@ -204,9 +199,9 @@ architecture arch of ALU is
 
 	end SET_FLAGS;
 
-	procedure NO_EFFECT(carry_in, overflow_in, negative_in, zero_in	: STD_LOGIC;
+	procedure NO_EFFECT(carry_in, overflow_in, negative_in, zero_in	: SIGNAL_BIT_TYPE;
 						carry_out, negative_out,
-						zero_out, overflow_out : out  STD_LOGIC) is
+						zero_out, overflow_out : out  SIGNAL_BIT_TYPE) is
 	begin
 		carry_out			:= carry_in;
 		zero_out			:= zero_in;
@@ -215,7 +210,7 @@ architecture arch of ALU is
 	end NO_EFFECT;
 
 begin
-	process (a, b, opcode, is_signed, carry_in, zero_in, overflow_in, negative_in)
+	process (a, b, opcode, carry_in, zero_in, overflow_in, negative_in)
 	begin
 		case opcode is
 
@@ -289,10 +284,34 @@ begin
 				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 
 			--For all branch instructions
-			when (OPCODE_BEQ or OPCODE_BGT or OPCODE_BHI or OPCODE_BAL or OPCODE_BLAL) =>
+			when OPCODE_BEQ =>
 				result_out := DO_ADD_S(a, b);
 				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
-
+				
+			when OPCODE_BGT =>
+				result_out := DO_ADD_S(a, b);
+				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
+				
+			when OPCODE_BHI =>
+				result_out := DO_ADD_S(a, b);
+				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);				
+				
+			when OPCODE_BAL =>
+				result_out := DO_ADD_S(a, b);
+				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
+				
+			when OPCODE_BLAL =>
+				result_out := DO_ADD_S(a, b);
+				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
+				
+			when OPCODE_LOAD =>
+				result_out := DO_LOAD_STORE(a);
+				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
+				
+			when OPCODE_STORE =>
+				result_out := DO_LOAD_STORE(a);
+				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
+				
 			when others =>
 				result_out := REG_TYPE(UNDEFINED_32);
 				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);

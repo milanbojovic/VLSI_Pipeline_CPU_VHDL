@@ -1,4 +1,4 @@
---INSTRUCTION CACHE
+-- CONTROL_UNIT --
 library IEEE;
 library WORK;
 
@@ -13,9 +13,9 @@ entity CONTROL_UNIT is
 		N, C, V, Z: std_logic;
 		
 		-- Output ports		
-		branch_instruction: 	out MUX_SELECT_TYPE;
-		imm : 					out MUX_SELECT_TYPE;
-		branch_cond:			out MUX_SELECT_TYPE
+		branch_instruction: 	out SIGNAL_BIT_TYPE;
+		imm : 					out SIGNAL_BIT_TYPE;
+		branch_cond:			out SIGNAL_BIT_TYPE
 		
     );
 end CONTROL_UNIT;
@@ -69,8 +69,13 @@ begin
 					else
 						branch_cond <= '0';
 					end if;
-				when (OPCODE_BAL or  OPCODE_BLAL) =>
+					
+				when OPCODE_BAL =>
 					branch_cond <= '1';
+					
+				when OPCODE_BLAL =>
+					branch_cond <= '1';
+					
 				when others =>
 					branch_cond <= '0';
 			end case;

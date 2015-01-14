@@ -15,7 +15,7 @@ package cpu_lib is
 	constant PHASE_DURATION 		: NATURAL 	:= 8;
 	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;
 
-	subtype 	OPCODE_TYPE 				is STD_LOGIC_VECTOR(4 downto 0);
+	subtype 	OPCODE_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
 --	subtype 	REG_ADDR_TYPE 			is STD_LOGIC_VECTOR(3 downto 0);
 	subtype 	IMMIDIATE_TYPE			is STD_LOGIC_VECTOR(16 downto 0);	--17 bits
 	subtype 	BRANCH_OFFSET_TYPE	is STD_LOGIC_VECTOR((REG_WIDTH - 6) downto 0);
@@ -23,7 +23,7 @@ package cpu_lib is
 	subtype 	WORD_TYPE 				is STD_LOGIC_VECTOR((WORD_WIDTH - 1) downto 0);
 	subtype 	ADDR_TYPE				is WORD_TYPE;
 	subtype 	INSTR_TYPE				is WORD_TYPE;
-	subtype	MUX_SELECT_TYPE		is STD_LOGIC;
+	subtype	SIGNAL_BIT_TYPE		is STD_LOGIC;
 
 	type	   CACHE_TYPE			 	is array (natural range 0 to INSTR_CACHE_SIZE) OF INSTR_TYPE; --  should be 2**10-1 or more
 

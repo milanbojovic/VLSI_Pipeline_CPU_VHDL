@@ -6,28 +6,29 @@ use work.cpu_lib.all;
 entity CSR is
 	port(
 		-- Input ports 
-		load 	: STD_LOGIC;
+		clk		: STD_LOGIC;
+		load 		: STD_LOGIC;
 		reset 	: STD_LOGIC;
 		
-		n_in : STD_LOGIC ;
-		c_in : STD_LOGIC ;
-		v_in : STD_LOGIC ;
-		z_in : STD_LOGIC ;
+		n_in : SIGNAL_BIT_TYPE ;
+		c_in : SIGNAL_BIT_TYPE ;
+		v_in : SIGNAL_BIT_TYPE ;
+		z_in : SIGNAL_BIT_TYPE ;
 		
 		-- Output ports
-		n_out : out STD_LOGIC := '0';
-		c_out : out STD_LOGIC := '0';
-		v_out : out STD_LOGIC := '0';
-		z_out : out STD_LOGIC := '0'
+		n_out : out SIGNAL_BIT_TYPE := '0';
+		c_out : out SIGNAL_BIT_TYPE := '0';
+		v_out : out SIGNAL_BIT_TYPE := '0';
+		z_out : out SIGNAL_BIT_TYPE := '0'
 		
 	);
 end entity;
 
-architecture BHV of CSR is
+architecture arch of CSR is
 begin
-	process(load, reset, n_in, c_in, v_in, z_in ) is
+	process(clk,load, reset, n_in, c_in, v_in, z_in ) is
 	begin
-		if(rising_edge(load)) then
+		if(rising_edge(clk)) then
 			if(reset = '1') then
 				n_out <= '0';
 				c_out <= '0';

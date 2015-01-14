@@ -11,7 +11,7 @@ entity MUX_2_IN_1 is
 		-- Input ports
 		a	: in  REG_TYPE;
 		b	: in  REG_TYPE;
-		sel: in  MUX_SELECT_TYPE;
+		sel: in  SIGNAL_BIT_TYPE;
 
 		-- Output ports
 		z	: out REG_TYPE
@@ -19,7 +19,7 @@ entity MUX_2_IN_1 is
 end MUX_2_IN_1;
 
 
-architecture BEH of MUX_2_IN_1 is
+architecture arch of MUX_2_IN_1 is
 begin
 
 	process(a, b, sel) is 
@@ -31,7 +31,7 @@ begin
 		else z <= UNDEFINED_32;
 		end if;
 	end process; 
-end architecture BEH;
+end architecture arch;
 
 
 

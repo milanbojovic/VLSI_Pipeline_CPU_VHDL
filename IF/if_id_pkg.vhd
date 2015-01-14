@@ -1,5 +1,5 @@
-library ieee;
-use ieee.std_logic_1164.all;
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
 use WORK.CPU_LIB.all;
 
 package IF_ID_PKG is

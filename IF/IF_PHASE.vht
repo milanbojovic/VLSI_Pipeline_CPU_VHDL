@@ -1,7 +1,6 @@
 LIBRARY ieee;                                         
 USE ieee.std_logic_1164.all;
 use WORK.CPU_PKG.all;
-use WORK.CPU_PKG.all;
 use WORK.EX_IF_PKG.all;
 use WORK.IF_ID_pkg.all;
 

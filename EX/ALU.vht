@@ -34,8 +34,6 @@ COMPONENT ALU
 	b : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
 	carry_in : IN STD_LOGIC;
 	carry_out : OUT STD_LOGIC;
-	clk : IN STD_LOGIC;
-	is_signed : IN STD_LOGIC;
 	negative_in : IN STD_LOGIC;
 	negative_out : OUT STD_LOGIC;
 	opcode : IN STD_LOGIC_VECTOR(4 DOWNTO 0);
@@ -47,15 +45,13 @@ COMPONENT ALU
 	);
 END COMPONENT;
 BEGIN
-	i1 : ALU
+	alu1 : ALU
 	PORT MAP (
 -- list connections between master ports and signals
 	a => a,
 	b => b,
 	carry_in => carry_in,
 	carry_out => carry_out,
-	clk => clk,
-	is_signed => is_signed,
 	negative_in => negative_in,
 	negative_out => negative_out,
 	opcode => opcode,

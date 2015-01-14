@@ -40,7 +40,6 @@ architecture arch of IF_PHASE is
 	shared variable next_pc				: REG_TYPE;-- := read_pc_plus_one_from_file;
 begin
 		COMP_INSTR_CACHE 	: entity work.INSTRUCTION_CACHE(arch) 	port map (record_in_crls, cache_addr1, cache_addr2, cache_ctrl, cache_data1, cache_data2);
-		--COMP_ADDER			: entity work.ADDER(arch) 					port map (PC, pc_plus_one);  --record_out_id.if_pc_id		
 
 		if_record_id.pc<= pc;
 		cache_ctrl		<= "001";
@@ -68,7 +67,6 @@ begin
 				when others =>
 						next_pc :=	ex_record_if.pc;
 			end case;			
-			
 		end if;
 	end process;
 	

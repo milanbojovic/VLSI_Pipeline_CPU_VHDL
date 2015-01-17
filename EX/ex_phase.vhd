@@ -105,12 +105,11 @@ begin
 		ex_record_mem.opcode  		<= sig_opcode;
 		
 		ex_record_if.branch_cond 	<= sig_cond;
-		--ex_record_mem.cond		 	<= sig_cond;
 		ex_record_mem.dst				<= reg_destionation;
 		ex_record_mem.pc				<= reg_pc;
 		
 	load_to_registers:
-	process(record_in_crls.clk) is 
+	process(record_in_crls.clk, id_record_ex) is 
 		-- Declaration(s) 
 	begin 
 		if record_in_crls.clk = '1' then

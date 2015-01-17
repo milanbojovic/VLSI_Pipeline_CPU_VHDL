@@ -8,10 +8,19 @@ package EX_MEM_PKG is
 		opcode		: OPCODE_TYPE;
 		pc 			: REG_TYPE;
 		alu_out		: REG_TYPE;
-		--cond 			: SIGNAL_BIT_TYPE;
 		dst	: REG_TYPE;
 	end record;
-
+	
+	type MEMPHASE_DATACACHE_RCD is record
+		control		: DATA_CONTROL_TYPE;
+		address		: ADDR_TYPE;
+		dataIn		: WORD_TYPE;
+	end record;
+	
+	type DATACACHE_MEMPHASE_RCD is record
+		dataOut		: REG_TYPE;
+	end record;
+	
 end package EX_MEM_PKG;
 
 package body EX_MEM_PKG is

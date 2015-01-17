@@ -10,8 +10,7 @@ package ID_EX_PKG is
 		a, b				: REG_TYPE;
 		immediate		: REG_TYPE;
 		branch_offset	: REG_TYPE;
-		dst			: REG_TYPE;		
-		--sel				: SIGNAL_BIT_TYPE;
+		dst				: REG_TYPE;		
 	end record;
 
 end package ID_EX_PKG;

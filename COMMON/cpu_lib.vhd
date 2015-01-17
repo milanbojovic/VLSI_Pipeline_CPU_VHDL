@@ -12,8 +12,9 @@ package cpu_lib is
 	constant ADDR_WIDTH 				: NATURAL 	:= 32;
 	constant SP_ADDR					: NATURAL 	:= 30;
 	constant LINK_ADDR				: NATURAL 	:= 31;
-	constant PHASE_DURATION 		: NATURAL 	:= 8;
-	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;
+	constant PHASE_DURATION 		: NATURAL 	:= 3;        -- SET PHASE DURATION !!!!!!!!
+	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;	 --  should be 2**10-1 or more
+	constant DATA_CACHE_SIZE		: NATURAL 	:= 2**13-1;	 --  should be 2**10-1 or more
 
 	subtype 	OPCODE_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
 --	subtype 	REG_ADDR_TYPE 			is STD_LOGIC_VECTOR(3 downto 0);
@@ -24,8 +25,11 @@ package cpu_lib is
 	subtype 	ADDR_TYPE				is WORD_TYPE;
 	subtype 	INSTR_TYPE				is WORD_TYPE;
 	subtype	SIGNAL_BIT_TYPE		is STD_LOGIC;
+	subtype	INSTR_CONTROL_TYPE	is STD_LOGIC_VECTOR(2 downto 0);
+	subtype	DATA_CONTROL_TYPE		is STD_LOGIC_VECTOR(3 downto 0);
 
-	type	   CACHE_TYPE			 	is array (natural range 0 to INSTR_CACHE_SIZE) OF INSTR_TYPE; --  should be 2**10-1 or more
+	type	   INSTR_CACHE_TYPE		is array (natural range 0 to INSTR_CACHE_SIZE) OF INSTR_TYPE;
+	type	   DATA_CACHE_TYPE	 	is array (natural range 0 to DATA_CACHE_SIZE)  OF INSTR_TYPE; 
 
 	constant OPCODE_AND			: OPCODE_TYPE := "00000"; -- Logical AND
 	constant OPCODE_SUB			: OPCODE_TYPE := "00001"; -- Substract
@@ -88,9 +92,10 @@ package cpu_lib is
 
 
 	--constant input_file			: STRING := "test_2_in.txt";
-	constant input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/input.txt";
---	constant output_file				: STRING := "test_2_out.txt";
-	--constant output_file			: STRING := "D:\altera\VLSI_VHDL\simulation\modelsim\test_1_out.txt";
+	constant instr_input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_inst_in.txt";
+	constant data_input_file_path			: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_data_in.txt";
+	constant expected_output_file			: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_out.txt";
+	constant actual_output_file			: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/generated_output.txt";
 
 	function read_pc_from_file return REG_TYPE;
 	function read_pc_plus_one_from_file return REG_TYPE;
@@ -107,7 +112,7 @@ package body cpu_lib is
 		variable pc_value			: WORD_TYPE;  -- pc from file
 	begin
 
-		file_open(input_file, input_file_path, read_mode);
+		file_open(input_file, instr_input_file_path, read_mode);
 
 		READLINE(input_file, input_line);  	--Read the line from the file
 		HREAD(input_line, pc_value);		--Read first word (pc adress)
@@ -117,22 +122,22 @@ package body cpu_lib is
 		return std_logic_vector(UNSIGNED(pc_value) + 1);
 	end;
 
+	
 	function read_pc_from_file return REG_TYPE is
 		file 		input_file		: text;
 		variable input_line1		: line;
 		variable pc_value1			: WORD_TYPE;  -- pc from file
 	begin
 
-		file_open(input_file, input_file_path, read_mode);
+		file_open(input_file, instr_input_file_path, read_mode);
 
 		READLINE(input_file, input_line1);  	--Read the line from the file
-		HREAD(input_line1, pc_value1);		--Read first word (pc adress)
+		HREAD(input_line1, pc_value1);			--Read first word (pc adress)
 
 		file_close(input_file);
 		return pc_value1;
 	end;
 
-	
 	-- logical shift left
 	function DO_SHIFT_LL (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE is
     begin
@@ -149,9 +154,6 @@ package body cpu_lib is
    function DO_SHIFT_ASR (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE is
    begin
 		return REG_TYPE(SHIFT_RIGHT(SIGNED(operand), TO_INTEGER(UNSIGNED(count))));
-   end DO_SHIFT_ASR;	
-	
-	
-
+   end DO_SHIFT_ASR;
 
 end cpu_lib;

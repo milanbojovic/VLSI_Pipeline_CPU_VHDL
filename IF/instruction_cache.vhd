@@ -1,4 +1,4 @@
---INSTRUCTION CACHE
+-- INSTRUCTION CACHE --
 library IEEE;
 library WORK;
 
@@ -14,67 +14,66 @@ entity INSTRUCTION_CACHE is
     (
 		-- Input ports
 		record_in_crls : in CRLS_RCD;
-	 
+
 		address1 	: in ADDR_TYPE;
 		address2 	: in ADDR_TYPE;
-		control		: in STD_LOGIC_VECTOR(2 downto 0);
+		control		: in INSTR_CONTROL_TYPE;
 
-		-- Output ports	
+		-- Output ports
 		data1		: out WORD_TYPE;
 		data2		: out WORD_TYPE
     );
 end INSTRUCTION_CACHE;
 
-architecture arch of INSTRUCTION_CACHE is	
-	function init_cache return CACHE_TYPE is 
+architecture arch of INSTRUCTION_CACHE is
+	function init_cache return INSTR_CACHE_TYPE is 
 		file 		input_file					: text;
 		variable input_line					: line;
 		variable input_addr, input_data 	: WORD_TYPE;-- address and data read from input file
-		variable tmp_mem : CACHE_TYPE := (others => (others => '0'));
-		
+		variable tmp_mem : INSTR_CACHE_TYPE := (others => (others => '0'));
 	begin
 		-- Init instruction cache from file
-		
-		file_open(input_file, input_file_path, read_mode);
-		
+
+		file_open(input_file, instr_input_file_path, read_mode);
+
 		READLINE(input_file, input_line);  	--Skip first line with PC register
-		
+
 		loop
 				exit when endfile(input_file);
-				
+
 				READLINE(input_file, input_line);  	--Read the line from the file
 				HREAD(input_line, input_addr);		--Read first word (adress)
 				READ(input_line, input_data);			--Read second word (value for memory location )
-				
-				tmp_mem(TO_INTEGER(UNSIGNED(input_addr(ADDR_WIDTH - 1 downto 0)))) := input_data;
-				
+
+				tmp_mem(TO_INTEGER(UNSIGNED(input_addr(input_addr'RANGE)))) := input_data;
+
 		end loop;
 
 		file_close(input_file);  --after reading all the lines close the file
-		
+
 		return tmp_mem;
 	end;
-	
-	shared variable instr_cache: CACHE_TYPE := init_cache;
-	
-begin	
+
+	shared variable instr_cache: INSTR_CACHE_TYPE := init_cache;
+
+begin
 	-- Checking control lines:
 	-- 001 - Take address from line address1 and return instruction on data1
 	-- 010 - Take address from line address2 and return instruction on data2
-	-- 011 - Take address from line address1 and address2 and return instruction on data1 and data2			
-	
+	-- 011 - Take address from line address1 and address2 and return instruction on data1 and data2
+
 	adr1: process(record_in_crls.clk, control)
 	begin
 		if (rising_edge(record_in_crls.clk) AND control = "001") OR (rising_edge(record_in_crls.clk) AND control = "011") then
 			data1 <= instr_cache(to_integer(signed(address1)));
 		end if;
 	end process adr1;
-	
+
 	adr2: process(record_in_crls.clk, control)
 	begin
 		if (rising_edge(record_in_crls.clk) AND control = "010") OR (rising_edge(record_in_crls.clk) AND control = "011") then
 			data2 <= instr_cache(to_integer(signed(address2)));
 		end if;
-	end process adr2;	
-	
+	end process adr2;
+
 end arch;

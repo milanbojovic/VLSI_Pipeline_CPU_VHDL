@@ -6,7 +6,7 @@ use IEEE.STD_LOGIC_1164.all;
 use WORK.CPU_PKG.all;
 use WORK.CPU_LIB.all;
 use IEEE.STD_LOGIC_ARITH.all;
---use IEEE.NUMERIC_STD.all;
+
 
 -- opcode : operation code check cpu_lib for more details
 -- a : value of the first operand

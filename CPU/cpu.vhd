@@ -6,8 +6,6 @@ use IEEE.STD_LOGIC_1164.all;
 use IEEE.numeric_std.all;
 use WORK.CPU_PKG.all;
 use WORK.CPU_LIB.all;
-use WORK.EX_IF_PKG.all;
-use WORK.IF_ID_PKG.all;
 
 entity CPU is
   port

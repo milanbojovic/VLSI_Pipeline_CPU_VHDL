@@ -5,9 +5,6 @@ library WORK;
 use IEEE.STD_LOGIC_1164.all;
 use WORK.CPU_PKG.all;
 use WORK.CPU_LIB.all;
-use WORK.ID_EX_PKG.all;
-use WORK.EX_IF_PKG.all;
-use WORK.EX_MEM_PKG.all;
 
 entity EX_PHASE is
 	port

@@ -1,11 +1,8 @@
--- Mem Wrapper - TEST !!!
+-- Mem Wrapper TEST --
 LIBRARY ieee;                                               
 USE ieee.std_logic_1164.all;             
 USE WORK.CPU_PKG.all;
-USE WORK.CPU_lib.all;
-use WORK.EX_MEM_PKG.all;
-use WORK.MEM_WB_PKG.all;
-                   
+USE WORK.CPU_lib.all;                   
 
 ENTITY MEM_WRAPPER_vhd_tst IS
 END MEM_WRAPPER_vhd_tst;

@@ -1,22 +1,8 @@
--- ***************************************************************************
--- This file contains a Vhdl test bench template that is freely editable to   
--- suit user's needs .Comments are provided in each section to help the user  
--- fill out necessary details.                                                
--- ***************************************************************************
--- Generated on "01/13/2015 21:58:56"
-                                                            
--- Vhdl Test Bench template for design  :  EX_PHASE
--- 
--- Simulation tool : ModelSim-Altera (VHDL)
--- 
-
+-- EX_PHASE TEST --
 LIBRARY ieee;                                               
 USE ieee.std_logic_1164.all;   
 USE WORK.CPU_PKG.all;
 USE WORK.CPU_lib.all;
-use WORK.EX_IF_PKG.all;
-use WORK.EX_MEM_PKG.all;
-use WORK.ID_EX_PKG.all;
               
 ENTITY EX_PHASE_vhd_tst IS
 END EX_PHASE_vhd_tst;

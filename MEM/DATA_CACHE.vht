@@ -1,14 +1,4 @@
--- ***************************************************************************
--- This file contains a Vhdl test bench template that is freely editable to   
--- suit user's needs .Comments are provided in each section to help the user  
--- fill out necessary details.                                                
--- ***************************************************************************
--- Generated on "01/15/2015 20:32:23"
-                                                            
--- Vhdl Test Bench template for design  :  DATA_CACHE
--- 
--- Simulation tool : ModelSim-Altera (VHDL)
-
+-- DATA_CACHE TEST--
 LIBRARY ieee;                                               
 USE ieee.std_logic_1164.all;   
 USE WORK.CPU_PKG.all;

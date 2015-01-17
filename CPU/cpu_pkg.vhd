@@ -54,6 +54,13 @@ package CPU_PKG is
 		pc			: REG_TYPE;
 	end record;
 	
+	-- Record for one way conection(WB --> ID)
+	type WB_ID_RCD is record
+		data				: REG_TYPE;
+		reg_adr			: REG_TYPE;
+		write_enable	: SIGNAL_BIT_TYPE;
+	end record;
+	
 	-- Record for one way connection of Mem phase with Data Cache(MEM_PHASE -> DATA_CACHE)
 	type MEMPHASE_DATACACHE_RCD is record
 		control		: DATA_CONTROL_TYPE;

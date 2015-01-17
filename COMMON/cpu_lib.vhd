@@ -10,14 +10,12 @@ package cpu_lib is
 	constant WORD_WIDTH				: NATURAL 	:= 32;
 	constant REG_WIDTH				: POSITIVE 	:= 32;
 	constant ADDR_WIDTH 				: NATURAL 	:= 32;
-	constant SP_ADDR					: NATURAL 	:= 30;
-	constant LINK_ADDR				: NATURAL 	:= 31;
 	constant PHASE_DURATION 		: NATURAL 	:= 3;        -- SET PHASE DURATION !!!!!!!!
 	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;	 --  should be 2**10-1 or more
 	constant DATA_CACHE_SIZE		: NATURAL 	:= 2**13-1;	 --  should be 2**10-1 or more
+	
 
 	subtype 	OPCODE_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
---	subtype 	REG_ADDR_TYPE 			is STD_LOGIC_VECTOR(3 downto 0);
 	subtype 	IMMIDIATE_TYPE			is STD_LOGIC_VECTOR(16 downto 0);	--17 bits
 	subtype 	BRANCH_OFFSET_TYPE	is STD_LOGIC_VECTOR((REG_WIDTH - 6) downto 0);
 	subtype 	REG_TYPE 				is STD_LOGIC_VECTOR((REG_WIDTH - 1) downto 0);
@@ -28,6 +26,8 @@ package cpu_lib is
 	subtype	INSTR_CONTROL_TYPE	is STD_LOGIC_VECTOR(2 downto 0);
 	subtype	DATA_CONTROL_TYPE		is STD_LOGIC_VECTOR(3 downto 0);
 
+	constant LINK_ADDR				: REG_TYPE 	:= "00000000000000000000000000011111";
+	
 	type	   INSTR_CACHE_TYPE		is array (natural range 0 to INSTR_CACHE_SIZE) OF INSTR_TYPE;
 	type	   DATA_CACHE_TYPE	 	is array (natural range 0 to DATA_CACHE_SIZE)  OF INSTR_TYPE; 
 
@@ -63,35 +63,21 @@ package cpu_lib is
 
 -- Constants used when value is not important
 	constant UNDEFINED_1 	: 	STD_LOGIC 	:= '-';
-	constant UNDEFINED_2 	: 	STD_LOGIC_VECTOR (1 downto 0) 	:= (others => '-');
-	constant UNDEFINED_3 	: 	STD_LOGIC_VECTOR (2 downto 0) 	:= (others => '-');
-	constant UNDEFINED_4 	: 	STD_LOGIC_VECTOR (3 downto 0) 	:= (others => '-');
-	constant UNDEFINED_8 	: 	STD_LOGIC_VECTOR (7 downto 0) 	:= (others => '-');
-	constant UNDEFINED_16	: STD_LOGIC_VECTOR (15 downto 0) 	:= (others => '-');
-	constant UNDEFINED_32 	: STD_LOGIC_VECTOR (31 downto 0) 	:= (others => '-');
+	constant UNDEFINED_2 	: 	STD_LOGIC_VECTOR 	(1  downto 0) 	:= (others => '-');
+	constant UNDEFINED_3 	: 	STD_LOGIC_VECTOR 	(2  downto 0) 	:= (others => '-');
+	constant UNDEFINED_4 	: 	STD_LOGIC_VECTOR 	(3  downto 0) 	:= (others => '-');
+	constant UNDEFINED_8 	: 	STD_LOGIC_VECTOR 	(7  downto 0) 	:= (others => '-');
+	constant UNDEFINED_16	: STD_LOGIC_VECTOR 	(15 downto 0) 	:= (others => '-');
+	constant UNDEFINED_32 	: STD_LOGIC_VECTOR 	(31 downto 0) 	:= (others => '-');
+		
+	constant ZERO_16 			: STD_LOGIC_VECTOR	(15 downto 0)	:= (others => '0');
+	constant ZERO_6 			: STD_LOGIC_VECTOR	(5  downto 0)	:= (others => '0');
+	constant ZERO_32 			: STD_LOGIC_VECTOR	(31 downto 0)	:= (others => '0');
+	
+	constant MAX_32 			: STD_LOGIC_VECTOR	(31 downto 0)	:= (others => '1');
+	constant MAX_16 			: STD_LOGIC_VECTOR	(15 downto 0)	:= (others => '1');
+	constant MAX_6  			: STD_LOGIC_VECTOR	(5  downto 0)	:= (others => '1');
 
---	constant F_SHIFT  : STD_LOGIC := '0'; -- Shift operation
---	constant F_ROTATE : STD_LOGIC := '1'; -- Rotate operation
-
-
---	constant L_BRANCH          : STD_LOGIC := '0'; -- Simple Branch
---	constant L_BRANCH_AND_LINK : STD_LOGIC := '1'; -- Branch and link
-
---	constant S_SIGNED    : STD_LOGIC := '1'; -- Signed operation
---	constant S_UNSIGNED  : STD_LOGIC := '0'; -- Unsigned operation
-
-	constant MAX_32 : STD_LOGIC_VECTOR(31 downto 0)		:= (others => '1');
-	constant MAX_16 : STD_LOGIC_VECTOR(15 downto 0)		:= (others => '1');
-	constant MAX_6  : STD_LOGIC_VECTOR(5 downto 0)		:= (others => '1');
-
-	constant ZERO_16 : STD_LOGIC_VECTOR(15 downto 0)	:= (others => '0');
-	constant ZERO_6 : STD_LOGIC_VECTOR(5 downto 0)		:= (others => '0');
-	constant ZERO_32 : STD_LOGIC_VECTOR(31 downto 0)	:= (others => '0');
-
---	constant HIGH_Z_32 : STD_LOGIC_VECTOR(31 downto 0)	:= (others => 'Z');
-
-
-	--constant input_file			: STRING := "test_2_in.txt";
 	constant instr_input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_inst_in.txt";
 	constant data_input_file_path			: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_data_in.txt";
 	constant expected_output_file			: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_out.txt";

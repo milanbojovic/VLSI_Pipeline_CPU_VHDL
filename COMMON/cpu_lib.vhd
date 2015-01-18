@@ -14,14 +14,14 @@ package cpu_lib is
 	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;	 --  should be 2**10-1 or more
 	constant DATA_CACHE_SIZE		: NATURAL 	:= 2**13-1;	 --  should be 2**10-1 or more
 	
-
-	subtype 	OPCODE_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
-	subtype 	IMMIDIATE_TYPE			is STD_LOGIC_VECTOR(16 downto 0);	--17 bits
-	subtype 	BRANCH_OFFSET_TYPE	is STD_LOGIC_VECTOR((REG_WIDTH - 6) downto 0);
-	subtype 	REG_TYPE 				is STD_LOGIC_VECTOR((REG_WIDTH - 1) downto 0);
-	subtype 	WORD_TYPE 				is STD_LOGIC_VECTOR((WORD_WIDTH - 1) downto 0);
-	subtype 	ADDR_TYPE				is WORD_TYPE;
-	subtype 	INSTR_TYPE				is WORD_TYPE;
+	subtype OPCODE_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
+	subtype IMMIDIATE_TYPE			is STD_LOGIC_VECTOR(16 downto 0);	--17 bits
+	subtype REG_ADDR_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
+	subtype BRANCH_OFFSET_TYPE	is STD_LOGIC_VECTOR((REG_WIDTH - 6) downto 0);
+	subtype REG_TYPE 				is STD_LOGIC_VECTOR((REG_WIDTH - 1) downto 0);
+	subtype WORD_TYPE 				is STD_LOGIC_VECTOR((WORD_WIDTH - 1) downto 0);
+	subtype ADDR_TYPE				is WORD_TYPE;
+	subtype INSTR_TYPE				is WORD_TYPE;
 	subtype	SIGNAL_BIT_TYPE		is STD_LOGIC;
 	subtype	INSTR_CONTROL_TYPE	is STD_LOGIC_VECTOR(2 downto 0);
 	subtype	DATA_CONTROL_TYPE		is STD_LOGIC_VECTOR(3 downto 0);
@@ -30,6 +30,12 @@ package cpu_lib is
 	
 	type	   INSTR_CACHE_TYPE		is array (natural range 0 to INSTR_CACHE_SIZE) OF INSTR_TYPE;
 	type	   DATA_CACHE_TYPE	 	is array (natural range 0 to DATA_CACHE_SIZE)  OF INSTR_TYPE; 
+
+	type  REG_FILE_TYPE 				is array (natural range 31 downto 0) OF REG_TYPE;
+	
+	subtype  INSTR_TYPE_TYPE		is STD_LOGIC_VECTOR(2 downto 0);
+	subtype	MUX_SELECT_TYPE		is STD_LOGIC;
+	
 
 	constant OPCODE_AND			: OPCODE_TYPE := "00000"; -- Logical AND
 	constant OPCODE_SUB			: OPCODE_TYPE := "00001"; -- Substract
@@ -61,22 +67,31 @@ package cpu_lib is
 
 	constant OPCODE_STOP		: OPCODE_TYPE := "11111"; -- Move of the second operand signed
 
--- Constants used when value is not important
+	-- Constants used when value is not important
 	constant UNDEFINED_1 	: 	STD_LOGIC 	:= '-';
 	constant UNDEFINED_2 	: 	STD_LOGIC_VECTOR 	(1  downto 0) 	:= (others => '-');
 	constant UNDEFINED_3 	: 	STD_LOGIC_VECTOR 	(2  downto 0) 	:= (others => '-');
 	constant UNDEFINED_4 	: 	STD_LOGIC_VECTOR 	(3  downto 0) 	:= (others => '-');
+
+	constant UNDEFINED_5 	: 	STD_LOGIC_VECTOR 	(4  downto 0) 	:= (others => '-');
 	constant UNDEFINED_8 	: 	STD_LOGIC_VECTOR 	(7  downto 0) 	:= (others => '-');
-	constant UNDEFINED_16	: STD_LOGIC_VECTOR 	(15 downto 0) 	:= (others => '-');
-	constant UNDEFINED_32 	: STD_LOGIC_VECTOR 	(31 downto 0) 	:= (others => '-');
-		
+	constant UNDEFINED_15	:  STD_LOGIC_VECTOR 	(14 downto 0) 	:= (others => '-');
+	constant UNDEFINED_16	:  STD_LOGIC_VECTOR 	(15 downto 0) 	:= (others => '-');
+	constant UNDEFINED_32 	:  STD_LOGIC_VECTOR 	(31 downto 0) 	:= (others => '-');
+	
+
 	constant ZERO_16 			: STD_LOGIC_VECTOR	(15 downto 0)	:= (others => '0');
+	constant ZERO_15 			: STD_LOGIC_VECTOR	(14 downto 0)	:= (others => '0');
 	constant ZERO_6 			: STD_LOGIC_VECTOR	(5  downto 0)	:= (others => '0');
+	constant ZERO_5 			: STD_LOGIC_VECTOR	(4  downto 0)	:= (others => '0');
 	constant ZERO_32 			: STD_LOGIC_VECTOR	(31 downto 0)	:= (others => '0');
 	
 	constant MAX_32 			: STD_LOGIC_VECTOR	(31 downto 0)	:= (others => '1');
 	constant MAX_16 			: STD_LOGIC_VECTOR	(15 downto 0)	:= (others => '1');
 	constant MAX_6  			: STD_LOGIC_VECTOR	(5  downto 0)	:= (others => '1');
+	constant MAX_15 			: STD_LOGIC_VECTOR	(14 downto 0)	:= (others => '1');
+	constant MAX_5  			: STD_LOGIC_VECTOR	(4  downto 0)	:= (others => '1');
+
 
 	constant instr_input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_inst_in.txt";
 	constant data_input_file_path			: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_data_in.txt";
@@ -88,6 +103,10 @@ package cpu_lib is
 	function DO_SHIFT_LL  (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE;
 	function DO_SHIFT_LSR (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE;
 	function DO_SHIFT_ASR (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE;
+	function func_sign_extend (op: IMMEDIATE_TYPE) return REG_TYPE;
+	function func_offset_extend (op: BRANCH_OFFSET_TYPE) return REG_TYPE;
+	function init_regs return REG_FILE_TYPE;
+	
 end cpu_lib;
 
 package body cpu_lib is
@@ -108,6 +127,16 @@ package body cpu_lib is
 		return std_logic_vector(UNSIGNED(pc_value) + 1);
 	end;
 
+	function init_regs return REG_FILE_TYPE is 
+		variable 	tmp       : REG_FILE_TYPE;
+	begin 
+		for addr_pos in 0 to 31 loop 
+			-- Initialize each address with the address itself
+			tmp(addr_pos) := STD_LOGIC_VECTOR(TO_UNSIGNED(addr_pos + 1, REG_TYPE'length));
+		end loop;
+		return tmp;
+	end init_regs;
+
 	
 	function read_pc_from_file return REG_TYPE is
 		file 		input_file		: text;
@@ -123,7 +152,34 @@ package body cpu_lib is
 		file_close(input_file);
 		return pc_value1;
 	end;
-
+		
+	function func_sign_extend (op: IMMEDIATE_TYPE) return REG_TYPE is
+		variable result : REG_TYPE;
+	 begin
+		if (op(16) = '1') then 
+            result := MAX_15 & op;
+        elsif(op(16) = '0') then 
+            result := ZERO_15 & op;
+        else
+            result := UNDEFINED_15 & op;
+       end if;
+		return result;
+    end func_sign_extend;
+	
+	function func_offset_extend (op: BRANCH_OFFSET_TYPE) return REG_TYPE is
+		variable result : REG_TYPE;
+	 begin
+		if (op(26) = '1') then 
+            result := MAX_5 & op;
+        elsif(op(26) = '0') then 
+            result := ZERO_5 & op;
+        else
+            result := UNDEFINED_5 & op;
+       end if;
+		return result;
+    end func_offset_extend;
+	
+	
 	-- logical shift left
 	function DO_SHIFT_LL (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE is
     begin

@@ -17,15 +17,17 @@ use WORK.CPU_LIB.all;
 -- load_store : flag that controls if store or load instruction is used (1 - store, 0 - load): 
 -- link_flag: determens if linking should be done during jump instructions (1 - link, 0 - none)
 
--- RnAddr : address of the Rn register of instruction
--- RdAddr : address of the Rd register of instruction
--- RmAddr : address of the Rm register of instruction
--- RsAddr : address of the Rs register of instruction
+-- RnAddr : address of the Ra register of instruction   : OBRAD : Operand A
+-- RdAddr : address of the Rd register of instruction   : OBRAD : Destination register 
+-- RmAddr : address of the Rb register of instruction   : OBRAD : Operand B
+-- RsAddr : address of the Rimm register of instruction : OBRAD : Immediate value  
 
 -- shift_operation : determens shift operation (0 - shift, 1 - rotate)
 -- shift_type: type of shift instuction (00 - LL, 01 - LSR, 10 - ASR, 11 - NONE)
 
--- immidiate : immidiate value from instruction
+-- immediate : immediate value from instruction
+
+
 
 entity INSTRUCTION_DECODER is
 	port

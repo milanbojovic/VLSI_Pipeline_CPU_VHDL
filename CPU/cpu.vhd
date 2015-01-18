@@ -35,7 +35,7 @@ begin
 		record_crls.stall <= stall;
 		
 		-- Try to connect clk with reordc_crls.clk and recursevly !!!
-		IF_PHASE : entity work.IF_PHASE(arch) port map (record_crls, ex_record_if, if_record_id);
+		--IF_PHASE : entity work.IF_PHASE(arch) port map (record_crls, ex_record_if, if_record_id);
 		
 	
 end arch;

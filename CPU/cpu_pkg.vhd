@@ -17,9 +17,11 @@ package CPU_PKG is
 	-- Record for one way conection (IF --> ID)
 	type IF_ID_RCD is record
 		pc 	: REG_TYPE;
-		ir		: REG_TYPE;
+		ir1	: REG_TYPE;
+		ir2	: REG_TYPE;
 	end record;
 
+	
 	-- Record for one way conectio (ID --> EX)
 	type ID_EX_RCD is record
 		opcode 			: OPCODE_TYPE;
@@ -29,6 +31,7 @@ package CPU_PKG is
 		branch_offset	: REG_TYPE;
 		dst				: REG_TYPE;		
 	end record;
+	
 	
 	-- Record for one way conection (EX --> IF)
 	type EX_IF_RCD is record
@@ -45,6 +48,7 @@ package CPU_PKG is
 		dst	: REG_TYPE;
 	end record;
 	
+	
 	-- Record for one way conection(MEM --> WB)
 	type MEM_WB_RCD is record
 		opcode 	: OPCODE_TYPE;
@@ -54,6 +58,7 @@ package CPU_PKG is
 		pc			: REG_TYPE;
 	end record;
 	
+	
 	-- Record for one way conection(WB --> ID)
 	type WB_ID_RCD is record
 		data				: REG_TYPE;
@@ -61,6 +66,15 @@ package CPU_PKG is
 		write_enable	: SIGNAL_BIT_TYPE;
 	end record;
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	-- DATA CACHE RECORDS
 	-- Record for one way connection of Mem phase with Data Cache(MEM_PHASE -> DATA_CACHE)
 	type MEMPHASE_DATACACHE_RCD is record
 		control		: DATA_CONTROL_TYPE;
@@ -68,10 +82,27 @@ package CPU_PKG is
 		dataIn		: WORD_TYPE;
 	end record;
 	
+	
 	-- Record for one way connection of Mem phase with Data Cache (DATA_CACHE -> MEM_PHASE)
 	type DATACACHE_MEMPHASE_RCD is record
 		dataOut		: REG_TYPE;
 	end record;
+	
+	
+	-- INSTRUCTION CACHE RECORDS
+	-- Record for one way connection of If phase with Instruction Cache(IF_PHASE -> INSTR_CACHE)
+	type IFPHASE_INSTCACHE_RCD is record
+		address1 	: ADDR_TYPE;
+		address2 	: ADDR_TYPE;
+		control		: INSTR_CONTROL_TYPE;
+	end record;
+	
+	
+	-- Record for one way connection of If phase with Instruction Cache(INSTR_CACHE -> IF_PHASE)
+	type INSTCACHE_IFPHASE_RCD is record
+		data1		: WORD_TYPE;
+		data2		: WORD_TYPE;
+	end record;	
 	
 end package CPU_PKG;
 

@@ -1,4 +1,4 @@
---IF Phase--
+-- MEM Phase --
 library IEEE;
 library WORK;
 

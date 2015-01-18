@@ -14,14 +14,10 @@ entity INSTRUCTION_CACHE is
     (
 		-- Input ports
 		record_in_crls : in CRLS_RCD;
-
-		address1 	: in ADDR_TYPE;
-		address2 	: in ADDR_TYPE;
-		control		: in INSTR_CONTROL_TYPE;
-
+		if_record_instr_cache	: in   IFPHASE_INSTCACHE_RCD;
+		
 		-- Output ports
-		data1		: out WORD_TYPE;
-		data2		: out WORD_TYPE
+		instr_cache_record_if	: out  INSTCACHE_IFPHASE_RCD
     );
 end INSTRUCTION_CACHE;
 
@@ -62,17 +58,17 @@ begin
 	-- 010 - Take address from line address2 and return instruction on data2
 	-- 011 - Take address from line address1 and address2 and return instruction on data1 and data2
 
-	adr1: process(record_in_crls.clk, control)
+	adr1: process(record_in_crls.clk, if_record_instr_cache.control)
 	begin
-		if (rising_edge(record_in_crls.clk) AND control = "001") OR (rising_edge(record_in_crls.clk) AND control = "011") then
-			data1 <= instr_cache(to_integer(signed(address1)));
+		if (rising_edge(record_in_crls.clk) AND if_record_instr_cache.control = "001") OR (rising_edge(record_in_crls.clk) AND if_record_instr_cache.control = "011") then
+			instr_cache_record_if.data1 <= instr_cache(to_integer(signed(if_record_instr_cache.address1)));
 		end if;
 	end process adr1;
 
-	adr2: process(record_in_crls.clk, control)
+	adr2: process(record_in_crls.clk, if_record_instr_cache.control)
 	begin
-		if (rising_edge(record_in_crls.clk) AND control = "010") OR (rising_edge(record_in_crls.clk) AND control = "011") then
-			data2 <= instr_cache(to_integer(signed(address2)));
+		if (rising_edge(record_in_crls.clk) AND if_record_instr_cache.control = "010") OR (rising_edge(record_in_crls.clk) AND if_record_instr_cache.control = "011") then
+			instr_cache_record_if.data2 <= instr_cache(to_integer(signed(if_record_instr_cache.address2)));
 		end if;
 	end process adr2;
 

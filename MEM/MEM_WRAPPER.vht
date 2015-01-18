@@ -8,11 +8,11 @@ ENTITY MEM_WRAPPER_vhd_tst IS
 END MEM_WRAPPER_vhd_tst;
 ARCHITECTURE MEM_WRAPPER_arch OF MEM_WRAPPER_vhd_tst IS
 -- constants                                                 
--- signals    
+-- signals
 
 SIGNAL record_in_crls		: CRLS_RCD;
 SIGNAL ex_record_mem			: EX_MEM_RCD;
-SIGNAL mem_record_wb			: MEM_WB_RCD;                                   
+SIGNAL mem_record_wb			: MEM_WB_RCD;
 
 COMPONENT MEM_WRAPPER
 	PORT (

@@ -19,7 +19,7 @@ entity MEM_PHASE is
 		-- WB Phase
 		mem_record_wb			: out MEM_WB_RCD;
 		
-		-- Signals to cache memory
+		-- DATA CACHE CONNECTIONS
 		
 		mem_record_data_cache	: out MEMPHASE_DATACACHE_RCD;
 		data_cache_record_mem	: in  DATACACHE_MEMPHASE_RCD

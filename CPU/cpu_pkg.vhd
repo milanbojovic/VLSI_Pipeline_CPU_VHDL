@@ -14,7 +14,7 @@ package CPU_PKG is
 	end record;
 	
 	
-	-- Record for one way conection (IF --> ID)
+	-- Record for one way conection (IF -crls-> ID)
 	type IF_ID_RCD is record
 		pc 	: REG_TYPE;
 		ir1	: REG_TYPE;
@@ -64,14 +64,20 @@ package CPU_PKG is
 		data				: REG_TYPE;
 		reg_adr			: REG_TYPE;
 		write_enable	: SIGNAL_BIT_TYPE;
-	end record;
+	end record;	
 	
 	
-	
-	
-	
-	
-	
+	--INSTRUCTION DECODE & REGISTER FILE CONNECTIONS
+	-- Record for one way connection of INSTRUCTION DECODER with REGISTER FILE (DECODER-> REGISTER_FILE)
+	type DECODER_REGFILE_RCD is record
+		opcode      	: OPCODE_TYPE;
+		operand_A		: REG_ADDR_TYPE; 				-- Operand_A address in register file 
+		operand_B		: REG_ADDR_TYPE; 				-- Operand_B address in register file 
+		immediate		: IMMEDIATE_TYPE;      		-- Immediate value 
+		destination 	: REG_ADDR_TYPE; 				-- Register index in the register file where the result will be put
+		offset 			: BRANCH_OFFSET_TYPE;		-- Address offset with branch instructions	
+		pc					: REG_TYPE;
+	end record;	
 	
 	
 	-- DATA CACHE RECORDS

@@ -3,107 +3,115 @@ library WORK;
 
 use IEEE.STD_LOGIC_1164.all;
 use IEEE.NUMERIC_STD.all;
+use WORK.CPU_PKG.all;
 use WORK.CPU_LIB.all;
-
 
 entity REG_FILE is
 
 	port
 	(
-		
-		-- Input ports
-		DPR      	   		: in STD_LOGIC; 						-- Extract the registers data acording to the DPR instruction's requirements
-		DPI						: in STD_LOGIC;						-- Extract the registers data acording to the DPR instruction's requirements
-		BRANCH					: in STD_LOGIC;						-- Extract the registers data acording to the DPR instruction's requirements
-		LOAD						: in STD_LOGIC;
-		STORE						: in STD_LOGIC;
-		write_enable			: in STD_LOGIC; 						-- Write enable when data is ready to be writen into the particular register
-		operand_A_index		: in REG_ADDR_TYPE; 					-- Operand_A address in register file 
-		operand_B_index		: in REG_ADDR_TYPE; 					-- Operand_B address in register file 
-		destination_index    : in REG_ADDR_TYPE; 					-- Register index in the register file where the result will be put
-		mem_address_index	   : in REG_ADDR_TYPE;					-- Register index which contains the address in memmmory when doing LOAD/STORE instructions 
-		store_data_index		: in REG_ADDR_TYPE;					-- Reguster index which contains the data wich will be put in memory with STORE instruction
-		input_data				: in REG_TYPE; 						-- Data that would be writen to the register specified by the destination address or store destination
-		opcode					: in OPCODE_TYPE;
-		immediate				: in IMMEDIATE_TYPE;
-		offset					: in BRANCH_OFFSET_TYPE;
-		destination_wb			: in REG_TYPE;
-		
+		-- Input ports from decoder
+		decoder_record_regfile	: in DECODER_REGFILE_RCD;
+
+		-- from wb phase
+		wb_record_id				: in WB_ID_RCD;
 		
 		-- Output ports
-		operand_A_out			: out REG_TYPE;
-		operand_B_out			: out REG_TYPE;
-	   destination_out		: out REG_TYPE;
-		immediate_out			: out REG_TYPE;
-		offset_out				: out REG_TYPE;
-		opcode_out				: out OPCODE_TYPE
+		id_record_ex				: out ID_EX_RCD
 		
 	);
 	
 end REG_FILE;
 
 
-architecture REG_ARCH of REG_FILE is
+architecture arch of REG_FILE is
 
-	shared variable register_array     : REG_FILE_TYPE := init_regs;
-	shared variable destination_wb_var : REG_ADDR_TYPE;	
-	
+	shared variable register_array	: REG_FILE_TYPE := init_regs;
+
 begin
 		
-		
-		
-		process(DPI, DPR, BRANCH, LOAD, STORE)
-			begin	
-				if(DPI = '1') then
+		process(decoder_record_regfile.opcode)
+			begin
+
+	case decoder_record_regfile.opcode is
+	
+			--Operation with registers + LOAD OPERATION
+			when 	OPCODE_AND | OPCODE_SUB |OPCODE_ADD  | OPCODE_ADC | OPCODE_SBC |
+					OPCODE_CMP | OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC|
+					OPCODE_MOV | OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_LOAD
+					=>
 				
-					--Operation with immediate value 
-					operand_A_out    <= register_array(TO_INTEGER(UNSIGNED(operand_A_index)));
-					destination_out  <= register_array(TO_INTEGER(UNSIGNED(destination_index)));
-					
-					opcode_out       <= opcode;
-					immediate_out    <= func_sign_extend(immediate);
-					
-				elsif (DPR = '1') then
+						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+						id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
+						id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
+						id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
+						id_record_ex.immediate			<= UNDEFINED_32;
+						id_record_ex.branch_offset		<= UNDEFINED_32;
+						id_record_ex.pc					<= decoder_record_regfile.PC;
+						
+						
+			when 	OPCODE_STORE =>
 				
-					--Operation with registers
-					operand_A_out   <= register_array(TO_INTEGER(UNSIGNED(operand_A_index)));
-					operand_B_out   <= register_array(TO_INTEGER(UNSIGNED(operand_B_index)));
-					destination_out <= register_array(TO_INTEGER(UNSIGNED(destination_index)));
-					
-					opcode_out       <= opcode;
-					
-				elsif (LOAD = '1') then
+						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+						id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
+						id_record_ex.b   					<= UNDEFINED_32;
+						id_record_ex.dst 					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.destination)));
+						id_record_ex.immediate			<= UNDEFINED_32;
+						id_record_ex.branch_offset		<= UNDEFINED_32;
+						id_record_ex.pc					<= decoder_record_regfile.PC;
+									
+			
+			--Operation with registers and immediate values
+			when 	OPCODE_UMOV | OPCODE_SMOV	=>
+			
+						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+						id_record_ex.a   					<= UNDEFINED_32;
+						id_record_ex.b   					<= UNDEFINED_32;
+						id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
+						id_record_ex.immediate			<= func_sign_extend(decoder_record_regfile.immediate);
+						id_record_ex.branch_offset		<= UNDEFINED_32;				
+						id_record_ex.pc					<= decoder_record_regfile.PC;
+			
+			-- BRANCH OPERATIONS
+			when 	OPCODE_BEQ | OPCODE_BGT | OPCODE_BHI | OPCODE_BAL | OPCODE_BLAL =>
+						
+						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+						id_record_ex.a   					<= UNDEFINED_32;
+						id_record_ex.b   					<= UNDEFINED_32;
+						id_record_ex.dst 					<= UNDEFINED_32;
+						id_record_ex.immediate			<= UNDEFINED_32;
+						id_record_ex.branch_offset		<= func_offset_extend(decoder_record_regfile.offset);
+						id_record_ex.pc					<= decoder_record_regfile.PC;
+						
+			when 	OPCODE_STOP =>
+						
+						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+						id_record_ex.a   					<= UNDEFINED_32;
+						id_record_ex.b   					<= UNDEFINED_32;
+						id_record_ex.dst 					<= UNDEFINED_32;
+						id_record_ex.immediate			<= UNDEFINED_32;
+						id_record_ex.branch_offset		<= UNDEFINED_32;		
+						id_record_ex.pc					<= decoder_record_regfile.PC;
 				
-					--Load operation 
-					operand_A_out <= register_array(TO_INTEGER(UNSIGNED(mem_address_index)));
-					destination_out <= register_array(TO_INTEGER(UNSIGNED(destination_index)));
-					
-					opcode_out       <= opcode;
-					
-				elsif (STORE = '1') then
-				
-					--Store operation 
-					destination_out <= register_array(TO_INTEGER(UNSIGNED(store_data_index))); --VIDI DA LI OVO TREBA U JEDAN OD A/B REGISTARA ZA INTERFEJS KA BOJKETU
-					operand_A_out <= register_array(TO_INTEGER(UNSIGNED(mem_address_index)));
-					
-					opcode_out       <= opcode;
-					
-				elsif (BRANCH = '1') then
-					-- BRANCH operation 
-					offset_out       <= func_offset_extend(offset);
-					
-					opcode_out       <= opcode;
-					
-				end if; 
+			
+			--WHEN INSTRUCTION IS NOT VALID
+			when others =>	
+						id_record_ex.opcode     		<= UNDEFINED_5 ;
+						id_record_ex.a   					<= UNDEFINED_32;
+						id_record_ex.b   					<= UNDEFINED_32;
+						id_record_ex.dst 					<= UNDEFINED_32;
+						id_record_ex.immediate			<= UNDEFINED_32;
+						id_record_ex.branch_offset		<= UNDEFINED_32;										
+						id_record_ex.pc					<= UNDEFINED_32;
+			end case;
 		end process;
 			
-		process(write_enable) begin
-			if (write_enable = '1') then
-				destination_wb_var := destination_wb(4 downto 0);
-				register_array(TO_INTEGER(UNSIGNED(destination_wb_var))) := input_data;
+		process(wb_record_id.write_enable) begin
+			--Warnings !!!
+			if (wb_record_id.write_enable = '1') then
+				register_array(TO_INTEGER(UNSIGNED(wb_record_id.reg_adr(4 downto 0)))) := wb_record_id.data;
 			end if;
+			
 		end process;
-
 		
-end REG_ARCH;
-
+end arch;

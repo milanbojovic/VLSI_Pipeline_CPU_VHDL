@@ -2,10 +2,8 @@ library IEEE;
 library WORK;
 
 use IEEE.STD_LOGIC_1164.all;
---use WORK.CPU_PKG.all;
+use WORK.CPU_PKG.all;
 use WORK.CPU_LIB.all;
---use WORK.EX_IF_PKG.all;
---use WORK.IF_ID_pkg.all;
 use IEEE.STD_LOGIC_ARITH.all;
 
 entity INSTRUCTION_DECODER is
@@ -14,107 +12,74 @@ entity INSTRUCTION_DECODER is
 	(
 		-- Input ports
 		instruction	: in REG_TYPE;
-		
+		pc 			: in REG_TYPE;
 		-- Output ports
-		opcode      	: out OPCODE_TYPE;
-		operand_A		: out REG_ADDR_TYPE; 				-- Operand_A address in register file 
-		operand_B		: out REG_ADDR_TYPE; 				-- Operand_B address in register file 
-		immediate		: out IMMEDIATE_TYPE;      		-- Immediate value 
-		destination 	: out REG_ADDR_TYPE; 				-- Register index in the register file where the result will be put
-		mem_address	   : out REG_ADDR_TYPE;					-- Register index which contains the address in memmmory when doing LOAD/STORE instructions 
-		reg_address    : out REG_ADDR_TYPE;					-- Register index wich is the destination with LOAD instruction 
-		store_data		: out REG_ADDR_TYPE;					-- Reguster index which contains the data wich will be put in memory with STORE instruction
-		offset 			: out BRANCH_OFFSET_TYPE;			-- Address offset with branch instructions
-		DPR_decoder  	: out STD_LOGIC; 						-- Extract the registers data acording to the DPR instruction's requirements
-		DPI_decoder		: out STD_LOGIC;						-- Extract the registers data acording to the DPR instruction's requirements
-		BRANCH_decoder	: out STD_LOGIC;						-- Extract the registers data acording to the DPR instruction's requirements
-		LOAD_decoder   : out STD_LOGIC;
-		STORE_decoder  : out STD_LOGIC
+		decoder_record_regfile : out DECODER_REGFILE_RCD
 		);
 end INSTRUCTION_DECODER;
 
-
-architecture decoder_arch of INSTRUCTION_DECODER is
+architecture arch of INSTRUCTION_DECODER is
 
 	shared variable opcode_var : OPCODE_TYPE;
 
 begin
-	
 	process(instruction)
-	
 	begin
 		
-		opcode_var := instruction(31 downto 27);
-		--UBACI I JEDAN IF BLOCK AKO JE NEKA NEDEFINISANA INSTRUKCIJA!!!
+		opcode_var := DECODE_OPCODE(instruction);
+	
+		case opcode_var is
+			when 	OPCODE_AND | OPCODE_SUB |OPCODE_ADD  | OPCODE_ADC | OPCODE_SBC |
+					OPCODE_CMP | OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC|
+					OPCODE_MOV | OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_LOAD | OPCODE_STORE
+					=>
 		
-		if (opcode_var /= UNDEFINED_5) then 
-		
-			if(opcode_var < OPCODE_UMOV) then	
+						decoder_record_regfile.opcode 		<= opcode_var;
+						decoder_record_regfile.operand_A   	<= DECODE_R1(instruction);
+						decoder_record_regfile.operand_B   	<= DECODE_R2(instruction);
+						decoder_record_regfile.destination 	<= DECODE_R3(instruction);
+						decoder_record_regfile.immediate		<= UNDEFINED_17;
+						decoder_record_regfile.offset			<= UNDEFINED_27;
+						decoder_record_regfile.pc				<= pc;
 			
-				operand_A   	<= instruction(26 downto 22);
-				operand_B   	<= instruction(21 downto 17);
-				destination 	<= instruction(16 downto 12);
-				DPI_decoder 	<= '0';
-				BRANCH_decoder <= '0';
-				LOAD_decoder   <= '0';
-				STORE_decoder  <= '0';
-				DPR_decoder 	<= '1';
+			when 	OPCODE_UMOV | OPCODE_SMOV	=>
 				
-			end if;
-			if ( (opcode_var = OPCODE_UMOV) or (opcode_var = OPCODE_SMOV) ) then	
-				
-				operand_A  		<= instruction(26 downto 22);
-				destination 	<= instruction(21 downto 17);
-				immediate   	<= instruction(16 downto 0);
-				DPR_decoder 	<= '0';
-				BRANCH_decoder <= '0';
-				LOAD_decoder   <= '0';
-				STORE_decoder  <= '0';
-				DPI_decoder 	<= '1';
-					
-			end if;
-			if (opcode_var = OPCODE_LOAD) then	
-				
-				mem_address <= instruction(26 downto 22);
-				reg_address <= instruction(21 downto 17);
-				DPR_decoder 	<= '0';
-				DPI_decoder 	<= '0';
-				BRANCH_decoder <= '0';
-				STORE_decoder  <= '0';
-				LOAD_decoder   <= '1';
+						decoder_record_regfile.opcode 		<= opcode_var;
+						decoder_record_regfile.operand_A   	<= UNDEFINED_5;
+						decoder_record_regfile.operand_B   	<= UNDEFINED_5;
+						decoder_record_regfile.destination	<= DECODE_R3(instruction);
+						decoder_record_regfile.immediate		<= DECODE_IMMEDIATE(instruction);
+						decoder_record_regfile.offset			<= UNDEFINED_27;
+						decoder_record_regfile.pc				<= pc;
 			
-			end if;
-			if (opcode_var = OPCODE_STORE) then	
+			when 	OPCODE_BEQ | OPCODE_BGT | OPCODE_BHI | OPCODE_BAL | OPCODE_BLAL =>
+						
+						decoder_record_regfile.opcode 		<= opcode_var;
+						decoder_record_regfile.operand_A   	<= UNDEFINED_5;
+						decoder_record_regfile.operand_B   	<= UNDEFINED_5;
+						decoder_record_regfile.destination 	<= UNDEFINED_5;
+						decoder_record_regfile.immediate		<= UNDEFINED_17;
+						decoder_record_regfile.offset			<= DECODE_OFFSET(instruction);
+						decoder_record_regfile.pc				<= pc;
+						
+			when 	OPCODE_STOP =>
+						decoder_record_regfile.opcode 		<= opcode_var;
+						decoder_record_regfile.operand_A   	<= UNDEFINED_5;
+						decoder_record_regfile.operand_B   	<= UNDEFINED_5;
+						decoder_record_regfile.destination 	<= UNDEFINED_5;
+						decoder_record_regfile.immediate		<= UNDEFINED_17;
+						decoder_record_regfile.offset			<= UNDEFINED_27;
+						decoder_record_regfile.pc				<= pc;
 			
-				mem_address <= instruction(26 downto 22);
-				store_data  <= instruction(21 downto 17);
-				DPR_decoder 	<= '0';
-				DPI_decoder 	<= '0';
-				BRANCH_decoder <= '0';
-				LOAD_decoder   <= '0';
-				STORE_decoder  <= '1';
-			
-			end if;
-		  if ((opcode_var >= OPCODE_BEQ) and (opcode_var < OPCODE_STOP)) then 
-				
-				offset <= instruction(26 downto 0);
-				DPR_decoder 	<= '0';
-				DPI_decoder 	<= '0';
-				LOAD_decoder   <= '0';
-				STORE_decoder  <= '0';
-				BRANCH_decoder <= '1';
-			
-			else 
-				
-				opcode_var := UNDEFINED_5;
-			
-			end if;
-			
-		end if;
---		
-		opcode <= opcode_var;
-			
-		
+			--WHEN INSTRUCTION IS NOT VALID
+			when others =>	
+						decoder_record_regfile.opcode			<= UNDEFINED_5;
+						decoder_record_regfile.operand_A		<= UNDEFINED_5;
+						decoder_record_regfile.operand_B		<= UNDEFINED_5;
+						decoder_record_regfile.immediate		<= UNDEFINED_17;
+						decoder_record_regfile.destination	<= UNDEFINED_5;
+						decoder_record_regfile.offset			<= UNDEFINED_27;
+						decoder_record_regfile.pc				<= UNDEFINED_32;
+		end case;	
 	end process;
-
-end decoder_arch;
+end arch;

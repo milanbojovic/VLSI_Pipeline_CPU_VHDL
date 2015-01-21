@@ -59,13 +59,6 @@ begin
 	process(record_in_crls.clk, mem_record_data_cache.control)
 	begin
 		if rising_edge(record_in_crls.clk)  then
-			
---			if control = "0001"  then
---					data_cache(TO_INTEGER(UNSIGNED(address(ADDR_WIDTH - 1 downto 0)))):= dataIn;
---			elsif control = "0010" then 
---					dataOut = data_cache(TO_INTEGER(UNSIGNED(address(ADDR_WIDTH - 1 downto 0))));
---			end if;
---			  
 			case mem_record_data_cache.control is
 
 				--Write to memory

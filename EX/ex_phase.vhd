@@ -81,7 +81,7 @@ begin
 																						 sig_csr_negative_in, sig_csr_carry_in, sig_csr_overflow_in, sig_csr_zero_in
 																						);
 																					
-		COMP_CSR_REG		: entity work.CSR(arch) 			port map (record_in_crls.clk, record_in_crls.load, record_in_crls.reset, 
+		COMP_CSR_REG		: entity work.CSR(arch) 			port map (record_in_crls.load, record_in_crls.reset, 
 																						 sig_csr_negative_in,  sig_csr_carry_in,  sig_csr_overflow_in,  sig_csr_zero_in,
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out
 																						);
@@ -105,19 +105,25 @@ begin
 		ex_record_mem.dst				<= reg_destionation;
 		ex_record_mem.pc				<= reg_pc;
 		
-	load_to_registers:
-	process(record_in_crls.clk, id_record_ex) is 
-		-- Declaration(s) 
-	begin 
-		if record_in_crls.clk = '1' then
+	process (record_in_crls.load, record_in_crls.reset) begin 
+		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') then 		
 			reg_opcode 			<= id_record_ex.opcode;
 			reg_pc				<=	id_record_ex.pc;
 			reg_a					<=	id_record_ex.a;
 			reg_b					<=	id_record_ex.b;
 			reg_immediate		<=	id_record_ex.immediate;
 			reg_branch_offset	<=	id_record_ex.branch_offset;
-			reg_destionation	<= id_record_ex.dst;
+			reg_destionation	<= id_record_ex.dst;				
+			
+		elsif	record_in_crls.reset = '0' then
+			reg_opcode 			<= OPCODE_TYPE;
+			reg_pc				<=	UNDEFINED_32;
+			reg_a					<=	UNDEFINED_32;
+			reg_b					<=	UNDEFINED_32;
+			reg_immediate		<=	UNDEFINED_32;
+			reg_branch_offset	<=	UNDEFINED_32;
+			reg_destionation	<= UNDEFINED_32;	
+
 		end if;
 	end process;
-
 end arch;

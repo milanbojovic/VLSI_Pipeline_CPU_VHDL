@@ -24,60 +24,69 @@ end WB_PHASE;
 
 architecture arch of WB_PHASE is
 	-- REGISTERS
-	
 	shared variable reg_opcode 		: OPCODE_TYPE;
 	shared variable reg_alu_out		: REG_TYPE;
-	shared variable reg_dst	 		: REG_TYPE;
-	shared variable reg_lmd	 		: REG_TYPE;
-	shared variable reg_pc			: REG_TYPE; 
+	shared variable reg_dst	 			: REG_TYPE;
+	shared variable reg_lmd	 			: REG_TYPE;
+	shared variable reg_pc				: REG_TYPE; 
 	
 begin
 
-	process(record_in_crls.clk) is 
-	begin 
-		if rising_edge(record_in_crls.clk) then
-			reg_opcode 		:= mem_record_wb.opcode;
-			reg_alu_out		:=	mem_record_wb.alu_out;
-			reg_dst			:=	mem_record_wb.dst;
-			reg_lmd			:= mem_record_wb.lmd;
-			reg_pc			:=	mem_record_wb.pc;
+
+	process (record_in_crls.load, record_in_crls.reset) begin 
+		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') then 		
+				reg_opcode 		:= mem_record_wb.opcode;
+				reg_alu_out		:=	mem_record_wb.alu_out;
+				reg_dst			:=	mem_record_wb.dst;
+				reg_lmd			:= mem_record_wb.lmd;
+				reg_pc			:=	mem_record_wb.pc;
+		
+		elsif record_in_crls.reset = '1' then
+				reg_opcode 		:= UNDEFINED_5;
+				reg_alu_out		:=	UNDEFINED_32;
+				reg_dst			:=	UNDEFINED_32;
+				reg_lmd			:= UNDEFINED_32;
+				reg_pc			:=	UNDEFINED_32;
 		end if;
-	end process;
-	
+	end process;	
 
 	WB_PROCESS:
-	process(record_in_crls.clk) is 
-	begin 
-		if rising_edge(record_in_crls.clk) then
+	process(record_in_crls.reset) is 
+	begin
+		if record_in_crls.reset = '0' then
 		
-		case reg_opcode is
-		
-			-- ALU INSTRUCTION REG/IMM (EXCEPT CMP)
-			when OPCODE_AND | OPCODE_SUB	| OPCODE_ADD | OPCODE_ADC | OPCODE_SBC |
-				  OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC| OPCODE_MOV |
-				  OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_UMOV| OPCODE_SMOV =>
-				
-				wb_record_id.data				<= reg_alu_out;
-				wb_record_id.reg_adr			<= reg_dst;
-				wb_record_id.write_enable	<= '1';
-				
-			when OPCODE_LOAD =>
-				wb_record_id.data				<= reg_lmd;
-				wb_record_id.reg_adr			<= reg_dst;
-				wb_record_id.write_enable	<= '1';
+			case reg_opcode is
 			
-			when OPCODE_BLAL =>
-				wb_record_id.data				<= reg_pc;
-				wb_record_id.reg_adr			<= LINK_ADDR;   -- Reg 31 (link reg)
-				wb_record_id.write_enable	<= '1';
+				-- ALU INSTRUCTION REG/IMM (EXCEPT CMP)
+				when OPCODE_AND | OPCODE_SUB	| OPCODE_ADD | OPCODE_ADC | OPCODE_SBC |
+					  OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC| OPCODE_MOV |
+					  OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_UMOV| OPCODE_SMOV =>
+					
+					wb_record_id.data				<= reg_alu_out;
+					wb_record_id.reg_adr			<= reg_dst;
+					wb_record_id.write_enable	<= '1';
+					
+				when OPCODE_LOAD =>
+					wb_record_id.data				<= reg_lmd;
+					wb_record_id.reg_adr			<= reg_dst;
+					wb_record_id.write_enable	<= '1';
 				
-			when others =>
-				-- NOTHING - ALL UNDEFINED
-				wb_record_id.data				<= UNDEFINED_32;
-				wb_record_id.reg_adr			<= UNDEFINED_32;
-				wb_record_id.write_enable	<= '0';
-		end case;
-	
+				when OPCODE_BLAL =>
+					wb_record_id.data				<= reg_pc;
+					wb_record_id.reg_adr			<= LINK_ADDR;   -- Reg 31 (link reg)
+					wb_record_id.write_enable	<= '1';
+					
+				when others =>
+					-- NOTHING - ALL UNDEFINED
+					wb_record_id.data				<= UNDEFINED_32;
+					wb_record_id.reg_adr			<= UNDEFINED_32;
+					wb_record_id.write_enable	<= '0';
+			end case;
+		else 
+		-- RESET = 1;
+			wb_record_id.data				<= UNDEFINED_32;
+			wb_record_id.reg_adr			<= UNDEFINED_32;
+			wb_record_id.write_enable	<= '0';
 		end if;
 	end process;	
 end arch;

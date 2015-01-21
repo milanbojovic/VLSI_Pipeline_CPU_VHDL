@@ -13,7 +13,7 @@ entity INSTRUCTION_CACHE is
   port
     (
 		-- Input ports
-		record_in_crls : in CRLS_RCD;
+		record_in_crls 			: in CRLS_RCD;
 		if_record_instr_cache	: in   IFPHASE_INSTCACHE_RCD;
 		
 		-- Output ports

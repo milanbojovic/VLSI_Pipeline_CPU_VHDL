@@ -6,7 +6,6 @@ use work.cpu_lib.all;
 entity CSR is
 	port(
 		-- Input ports 
-		clk		: STD_LOGIC;
 		load 		: STD_LOGIC;
 		reset 	: STD_LOGIC;
 		
@@ -26,9 +25,9 @@ end entity;
 
 architecture arch of CSR is
 begin
-	process(clk,load, reset, n_in, c_in, v_in, z_in ) is
+	process(load, reset, n_in, c_in, v_in, z_in ) is
 	begin
-		if(rising_edge(clk)) then
+		if(rising_edge(load)) then
 			if(reset = '1') then
 				n_out <= '0';
 				c_out <= '0';

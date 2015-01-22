@@ -313,6 +313,7 @@ begin
 				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 				
 			when others =>
+				--STOP instruction included !!!
 				result_out := REG_TYPE(UNDEFINED_32);
 				NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 		end case;

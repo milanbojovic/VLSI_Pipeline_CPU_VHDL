@@ -10,6 +10,8 @@ entity REG_FILE is
 
 	port
 	(
+		record_in_crls			:  in CRLS_RCD;
+		
 		-- Input ports from decoder
 		decoder_record_regfile	: in DECODER_REGFILE_RCD;
 
@@ -106,12 +108,11 @@ begin
 			end case;
 		end process;
 			
-		process(wb_record_id.write_enable) begin
+		process(record_in_crls.clk) begin
 			--Warnings !!!
-			if (wb_record_id.write_enable = '1') then
+			if (rising_edge(record_in_crls.clk) and wb_record_id.write_enable = '1') then
 				register_array(TO_INTEGER(UNSIGNED(wb_record_id.reg_adr(4 downto 0)))) := wb_record_id.data;
 			end if;
-			
 		end process;
 		
 end arch;

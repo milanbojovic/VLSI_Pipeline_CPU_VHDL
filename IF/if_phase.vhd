@@ -28,51 +28,61 @@ end IF_PHASE;
 architecture arch of IF_PHASE is		
 	
 	--Register PC (Program Counter)
-	signal reg_pc							: REG_TYPE ;
-	signal reg_ir1, reg_ir2				: REG_TYPE ;
+	signal reg_next_pc						: REG_TYPE ;
+	signal reg_ir1, reg_ir2					: REG_TYPE ;
+	signal reg_pc								: REG_TYPE := read_pc_from_file;
 	
-	shared variable pc_plus_one		: REG_TYPE := UNDEFINED_32;
-	shared variable next_pc				: REG_TYPE := read_pc_from_file;--:= read_pc_plus_one_from_file;
+	shared variable sig_next_pc			: REG_TYPE ;--:= read_pc_plus_one_from_file;
 begin		
-		if_record_instr_cache.control			<= "001";
-		if_record_instr_cache.address1 		<= reg_pc;
-		if_record_instr_cache.address2		<= reg_pc;
-		reg_ir1				<= instr_cache_record_if.data1;
-		reg_ir2				<= instr_cache_record_if.data2;
+		if_record_instr_cache.control		<= "011";
+		if_record_instr_cache.address1 	<= reg_pc;
+		if_record_instr_cache.address2	<= reg_pc;
+		reg_ir1									<= instr_cache_record_if.data1;
+		reg_ir2									<= instr_cache_record_if.data2;
+		if_record_id.pc						<= signed(reg_pc) + 1;
+		if_record_id.ir1						<= reg_ir1;
+		if_record_id.ir2						<= reg_ir2;
 		
-		if_record_id.ir1	<= reg_ir1;
-		if_record_id.ir2	<= reg_ir2;
-		
-	process(record_in_crls.reset, record_in_crls.clk) is 
-		-- Declaration(s) 
-	begin 
-		if(record_in_crls.reset = '1') then
-			-- Asynchronous Sequential Statement(s) 
-			--next_pc := read_pc_from_file;
-		elsif(falling_edge(record_in_crls.clk)) then
-			-- Synchronous Sequential Statement(s)
-			reg_pc <= next_pc;					
-		elsif(rising_edge(record_in_crls.clk)) then	
-			case ex_record_if.branch_cond is
-				when '0'	=>
-						next_pc := pc_plus_one;
-				when others =>
-						next_pc := ex_record_if.pc;
-			end case;			
-		end if;
-	end process;
-	
-	ADDER :
-	process(reg_pc) is
-	begin
-		pc_plus_one := signed(reg_pc) + 1;
-	end process;
-	
-	process_record_next_pc :
-	process(record_in_crls.clk) is
-	begin
+	pc_register:
+	process(record_in_crls.clk, record_in_crls.load, record_in_crls.reset) is 
+	begin 	
 		if rising_edge(record_in_crls.clk) then
-			if_record_id.pc<= next_pc;
+			if (record_in_crls.load = '1') then
+					reg_pc <= reg_next_pc;
+			end if;
 		end if;
 	end process;
+	
+	
+--	proc_reset:
+--	process(record_in_crls.reset) is 
+--	begin 	
+--		if(record_in_crls.reset = '1') then
+--			reg_pc <= read_pc_from_file;
+--		end if;
+--	end process;
+	
+	
+	
+	
+	next_pc:
+	process(record_in_crls.clk) is
+	begin				
+			if rising_edge(record_in_crls.clk) then
+				reg_next_pc <= sig_next_pc;
+			end if;
+	end process;	
+	
+	
+	process_mux_logic:
+	process(ex_record_if.branch_cond, ex_record_if.pc, reg_pc) is
+	begin				
+		case (ex_record_if.branch_cond) is
+			when '0'	=>
+					sig_next_pc := signed(reg_pc) + 1;
+			when others =>
+					sig_next_pc := ex_record_if.pc;
+		end case;					
+	end process;	
+	
 end arch;

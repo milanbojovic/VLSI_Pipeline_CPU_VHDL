@@ -57,6 +57,7 @@ begin
 	--Instatination and connecting of REG_FILE
 	COMP_reg_file : entity work.REG_FILE(arch)
 		port map (
+						record_in_crls				=>	record_in_crls,
 						decoder_record_regfile	=> decoder_record_regfile, 
 						wb_record_id				=> wb_record_id,
 						id_record_ex				=> id_record_ex

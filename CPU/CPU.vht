@@ -1,16 +1,18 @@
 -- CPU TEST --
 LIBRARY ieee;                                               
-USE ieee.std_logic_1164.all;                                
+USE ieee.std_logic_1164.all;          
+USE WORK.CPU_PKG.all;
+USE WORK.CPU_lib.all;                        
 
 ENTITY CPU_vhd_tst IS
 END CPU_vhd_tst;
 ARCHITECTURE CPU_arch OF CPU_vhd_tst IS
 -- constants                                                 
 -- signals                                                   
-SIGNAL clk : STD_LOGIC;
-SIGNAL load : STD_LOGIC;
-SIGNAL reset : STD_LOGIC;
-SIGNAL stall : STD_LOGIC;
+SIGNAL clk : STD_LOGIC		:= '0';
+SIGNAL load : STD_LOGIC		:= '0';
+SIGNAL reset : STD_LOGIC	:= '0';
+SIGNAL stall : STD_LOGIC	:= '0';
 COMPONENT CPU
 	PORT (
 	clk : IN STD_LOGIC;
@@ -49,7 +51,7 @@ variable load_next : std_logic := '0';
 variable step : INTEGER := 0;
 BEGIN
 	if rising_edge(clk) then 
-		if step = 0 then 
+		if step = 2 then 
 			load <= '1';
 		else
 			load <= '0';
@@ -61,7 +63,8 @@ END PROCESS;
 always : PROCESS
 BEGIN
   report "Simulation started !!!";
-    
+  
+  
   wait for 100 ns;
                                              
 END PROCESS always;

@@ -115,8 +115,8 @@ begin
 			reg_branch_offset	<=	id_record_ex.branch_offset;
 			reg_destionation	<= id_record_ex.dst;				
 			
-		elsif	record_in_crls.reset = '0' then
-			reg_opcode 			<= OPCODE_TYPE;
+		elsif	(record_in_crls.reset = '1') then
+			reg_opcode 			<= UNDEFINED_5	;
 			reg_pc				<=	UNDEFINED_32;
 			reg_a					<=	UNDEFINED_32;
 			reg_b					<=	UNDEFINED_32;

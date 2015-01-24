@@ -37,6 +37,13 @@ package CPU_PKG is
 	type EX_IF_RCD is record
 		pc				: REG_TYPE;
 		branch_cond	: SIGNAL_BIT_TYPE;
+		flush_out	: SIGNAL_BIT_TYPE;
+	end record;
+	
+	
+	-- Record for one way conection (EX --> ID)
+	type EX_ID_RCD is record
+		flush_out	: SIGNAL_BIT_TYPE;
 	end record;
 	
 	

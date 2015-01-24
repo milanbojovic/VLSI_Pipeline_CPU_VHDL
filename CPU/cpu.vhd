@@ -24,12 +24,13 @@ architecture arch of CPU is
 	--Records
 	signal record_in_crls : CRLS_RCD;
 	signal ex_record_if	 : EX_IF_RCD;
+	signal ex_record_id	 : EX_ID_RCD;
+	signal ex_record_mem  : EX_MEM_RCD;
 	signal if_record_id	 : IF_ID_RCD;
 	signal id_record_ex	 : ID_EX_RCD;
-	signal ex_record_mem  : EX_MEM_RCD;
 	signal mem_record_wb  : MEM_WB_RCD;
 	signal wb_record_id   : WB_ID_RCD;
-	signal id_control : ID_MEM_RCD;
+	signal id_control 	 : ID_MEM_RCD;
 	
 	signal sig_if_record_instr_cache	: IFPHASE_INSTCACHE_RCD;
 	signal sig_instr_cache_record_if	: INSTCACHE_IFPHASE_RCD;
@@ -39,8 +40,8 @@ architecture arch of CPU is
 begin	
 				
 		COMP_IF_PHASE  : entity work.IF_PHASE(arch)		port map (record_in_crls, ex_record_if, if_record_id, sig_if_record_instr_cache, sig_instr_cache_record_if);
-		COMP_ID_PHASE	: entity work.ID_PHASE(arch) 		port map (record_in_crls, if_record_id, wb_record_id, id_record_ex, id_control);
-		COMP_EX_PHASE	: entity work.EX_PHASE(arch) 		port map (record_in_crls, id_record_ex, ex_record_if, ex_record_mem);
+		COMP_ID_PHASE	: entity work.ID_PHASE(arch) 		port map (record_in_crls, if_record_id, wb_record_id, ex_record_id, id_record_ex, id_control);
+		COMP_EX_PHASE	: entity work.EX_PHASE(arch) 		port map (record_in_crls, id_record_ex, ex_record_if, ex_record_id, ex_record_mem);
 		COMP_MEM_PHASE : entity work.MEM_PHASE(arch) 	port map (record_in_crls, ex_record_mem, mem_record_wb, sig_mem_record_data_cache, sig_data_cache_record_mem);
 		COMP_WB_PHASE	: entity work.WB_PHASE(arch) 		port map (record_in_crls, mem_record_wb, wb_record_id);
 		

@@ -15,7 +15,8 @@ entity CONTROL_UNIT is
 		-- Output ports		
 		branch_instruction: 	out SIGNAL_BIT_TYPE;
 		imm : 					out SIGNAL_BIT_TYPE;
-		branch_cond:			out SIGNAL_BIT_TYPE
+		branch_cond:			out SIGNAL_BIT_TYPE;
+		flush_out:				out SIGNAL_BIT_TYPE
 		
     );
 end CONTROL_UNIT;
@@ -54,30 +55,39 @@ begin
 				when OPCODE_BEQ =>
 					if(Z = '1') then
 						branch_cond <= '1';
+						flush_out	<= '1';
+						
 					else
 						branch_cond <= '0';
+						flush_out	<= '0';
 					end if;
 				when OPCODE_BGT =>
 					if(N = V and Z = '0') then
 						branch_cond <= '1';
+						flush_out	<= '1';						
 					else
 						branch_cond <= '0';
+						flush_out	<= '0';						
 					end if;
 				when OPCODE_BHI =>
 					if(C = '0' and Z = '0') then
 						branch_cond <= '1';
+						flush_out	<= '1';
 					else
 						branch_cond <= '0';
+						flush_out	<= '0';
 					end if;
 					
 				when OPCODE_BAL =>
 					branch_cond <= '1';
+					flush_out	<= '1';
 					
 				when OPCODE_BLAL =>
 					branch_cond <= '1';
-					
+					flush_out	<= '1';
 				when others =>
 					branch_cond <= '0';
+					flush_out	<= '0';
 			end case;
 	end process;
 	

@@ -39,9 +39,24 @@ begin
 		if_record_instr_cache.address2	<= reg_pc;
 		reg_ir1									<= instr_cache_record_if.data1;
 		reg_ir2									<= instr_cache_record_if.data2;
-		if_record_id.pc						<= signed(reg_pc) + 1;
-		if_record_id.ir1						<= reg_ir1;
-		if_record_id.ir2						<= reg_ir2;
+
+		
+	flush_signal_daemon:
+	process(record_in_crls.clk, ex_record_if.flush_out) is 
+	begin 	
+		if rising_edge(record_in_crls.clk) then
+			if (ex_record_if.flush_out = '1') then
+				if_record_id.pc						<= UNDEFINED_32;
+				if_record_id.ir1						<= UNDEFINED_32;
+				if_record_id.ir2						<= UNDEFINED_32;
+			else 
+				if_record_id.pc						<= signed(reg_pc) + 1;
+				if_record_id.ir1						<= reg_ir1;
+				if_record_id.ir2						<= reg_ir2;
+			end if;
+		end if;
+	end process;
+		
 		
 	pc_register:
 	process(record_in_crls.clk, record_in_crls.load, record_in_crls.reset) is 
@@ -61,7 +76,6 @@ begin
 --			reg_pc <= read_pc_from_file;
 --		end if;
 --	end process;
-	
 	
 	
 	

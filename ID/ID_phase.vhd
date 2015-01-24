@@ -21,11 +21,12 @@ entity ID_PHASE is
 		--MEM phase
 		wb_record_id			:  in WB_ID_RCD;
 
+		ex_record_id			: 	in EX_ID_RCD;
 		-- Output ports
 		--EX phase
-		id_record_ex			: out ID_EX_RCD;
+		id_record_ex			: 	out ID_EX_RCD;
 		
-		id_record_control		: out ID_MEM_RCD
+		id_record_control		: 	out ID_MEM_RCD
 		
 	);
 
@@ -63,9 +64,10 @@ begin
 						record_in_crls				=>	record_in_crls,
 						decoder_record_regfile	=> decoder_record_regfile, 
 						wb_record_id				=> wb_record_id,
+						ex_record_id				=> ex_record_id,
 						id_record_ex				=> id_record_ex
 					 );
-
+					 
 		
 	-- REMOVE ME LATER PLEASE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	-- THIS FUNCTIONALITY SHOULD BE MOVED TO CONTROL UNIT !!!!!!!!!!!!!!!!

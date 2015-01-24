@@ -104,13 +104,17 @@ package cpu_lib is
 	constant instr_input_file_path	: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_inst_in.txt";
 	constant data_input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_data_in.txt";
 	constant expected_output_file		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_out.txt";
+--	constant instr_input_file_path : STRING := "D:/VLSI project/IO/javni_test_inst_in.txt";
+--	constant data_input_file_path  : STRING := "D:/VLSI project/IO/javni_test_data_in.txt";
+--	constant expected_output_file  : STRING := "D:/VLSI project/IO/javni_test_out.txt";
+--	constant actual_output_file  : STRING := "D:/VLSI project/IO/generated_output.txt";
 
 	function read_pc_from_file return REG_TYPE;
 	function read_pc_plus_one_from_file return REG_TYPE;
 	function DO_SHIFT_LL  (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE;
 	function DO_SHIFT_LSR (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE;
 	function DO_SHIFT_ASR (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE;
-	function func_sign_extend (op: IMMEDIATE_TYPE) return REG_TYPE;
+	function func_sign_extend (op: IMMEDIATE_TYPE; opcode: OPCODE_TYPE) return REG_TYPE;
 	function func_offset_extend (op: BRANCH_OFFSET_TYPE) return REG_TYPE;
 	function init_regs return REG_FILE_TYPE;
 	function DECODE_OPCODE (instruction: REG_TYPE) 		return OPCODE_TYPE;
@@ -169,16 +173,21 @@ package body cpu_lib is
 	end;
 	
 
-	function func_sign_extend (op: IMMEDIATE_TYPE) return REG_TYPE is
+	function func_sign_extend (op: IMMEDIATE_TYPE; opcode: OPCODE_TYPE) return REG_TYPE is
 		variable result : REG_TYPE;
 	 begin
-		if (op(16) = '1') then
-            result := MAX_15 & op;
-        elsif(op(16) = '0') then
-            result := ZERO_15 & op;
-        else
-            result := UNDEFINED_15 & op;
-       end if;
+		if opcode = OPCODE_SMOV then 
+			if (op(16) = '1') then
+					result := MAX_15 & op;
+			  elsif(op(16) = '0') then
+					result := ZERO_15 & op;
+			  else
+					result := UNDEFINED_15 & op;
+			 end if;
+		else
+			--UNSIGNED MOV
+			result := ZERO_15 & op;
+		end if;
 		return result;
     end func_sign_extend;
 

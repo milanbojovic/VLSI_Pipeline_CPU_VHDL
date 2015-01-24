@@ -18,6 +18,9 @@ entity REG_FILE is
 		-- from wb phase
 		wb_record_id				: in WB_ID_RCD;
 		
+		-- from ex_phase
+		ex_record_id				: in EX_ID_RCD;
+		
 		-- Output ports
 		id_record_ex				: out ID_EX_RCD
 		
@@ -32,116 +35,127 @@ architecture arch of REG_FILE is
 
 begin
 		
-		process(decoder_record_regfile.opcode)
-			begin
+		process(decoder_record_regfile.opcode,record_in_crls.clk)
+		begin		
+		
+		if (ex_record_id.flush_out = '1') then 
+			id_record_ex.opcode     		<= UNDEFINED_5 ;
+			id_record_ex.a   					<= UNDEFINED_32;
+			id_record_ex.b   					<= UNDEFINED_32;
+			id_record_ex.dst 					<= UNDEFINED_32;
+			id_record_ex.immediate			<= UNDEFINED_32;
+			id_record_ex.branch_offset		<= UNDEFINED_32;										
+			id_record_ex.pc					<= UNDEFINED_32;			
+			
+		else
+			case decoder_record_regfile.opcode is
+		
+				--Operation with registers
+				when 	OPCODE_AND | OPCODE_SUB |OPCODE_ADD  | OPCODE_ADC | OPCODE_SBC |
+						OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC| 
+						OPCODE_SL  | OPCODE_SR  | OPCODE_ASR 
+						=>
+					
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
+							id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
+							id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;
+							id_record_ex.pc					<= decoder_record_regfile.PC;
+				
+				
+				when 	OPCODE_CMP =>
+					
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
+							id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
+							id_record_ex.dst 					<= UNDEFINED_32;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;
+							id_record_ex.pc					<= decoder_record_regfile.PC;
+							
+				
+				when 	OPCODE_MOV | OPCODE_NOT
+						=>
+					
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= UNDEFINED_32;
+							id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
+							id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;
+							id_record_ex.pc					<= decoder_record_regfile.PC;
+							
+							
+				when 	OPCODE_LOAD
+						=>
+					
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
+							id_record_ex.b   					<= UNDEFINED_32;
+							id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;
+							id_record_ex.pc					<= decoder_record_regfile.PC;
 
-	case decoder_record_regfile.opcode is
-	
-			--Operation with registers
-			when 	OPCODE_AND | OPCODE_SUB |OPCODE_ADD  | OPCODE_ADC | OPCODE_SBC |
-					OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC| 
-					OPCODE_SL  | OPCODE_SR  | OPCODE_ASR 
-					=>
+							
+				when 	OPCODE_STORE =>
+					
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
+							id_record_ex.b   					<= UNDEFINED_32;
+							id_record_ex.dst 					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.destination)));
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;
+							id_record_ex.pc					<= decoder_record_regfile.PC;
+										
 				
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
-						id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
-						id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-			
-			
-			when 	OPCODE_CMP =>
+				--Operation with registers and immediate values
+				when 	OPCODE_UMOV | OPCODE_SMOV	=>
 				
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
-						id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
-						id_record_ex.dst 					<= UNDEFINED_32;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-						
-			
-			when 	OPCODE_MOV | OPCODE_NOT
-					=>
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= UNDEFINED_32;
+							id_record_ex.b   					<= UNDEFINED_32;
+							id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
+							id_record_ex.immediate			<= func_sign_extend(decoder_record_regfile.immediate, decoder_record_regfile.opcode);
+							id_record_ex.branch_offset		<= UNDEFINED_32;				
+							id_record_ex.pc					<= decoder_record_regfile.PC;
 				
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= UNDEFINED_32;
-						id_record_ex.b   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_B)));
-						id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-						
-						
-			when 	OPCODE_LOAD
-					=>
 				
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
-						id_record_ex.b   					<= UNDEFINED_32;
-						id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;
-						id_record_ex.pc					<= decoder_record_regfile.PC;
+				-- BRANCH OPERATIONS
+				when 	OPCODE_BEQ | OPCODE_BGT | OPCODE_BHI | OPCODE_BAL | OPCODE_BLAL =>
+							
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= UNDEFINED_32;
+							id_record_ex.b   					<= UNDEFINED_32;
+							id_record_ex.dst 					<= UNDEFINED_32;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= func_offset_extend(decoder_record_regfile.offset);
+							id_record_ex.pc					<= decoder_record_regfile.PC;
+							
+				when 	OPCODE_STOP =>
+							
+							id_record_ex.opcode     		<= decoder_record_regfile.opcode;
+							id_record_ex.a   					<= UNDEFINED_32;
+							id_record_ex.b   					<= UNDEFINED_32;
+							id_record_ex.dst 					<= UNDEFINED_32;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;		
+							id_record_ex.pc					<= decoder_record_regfile.PC;
+				
+				--WHEN INSTRUCTION IS NOT VALID
+				when others =>	
+							id_record_ex.opcode     		<= UNDEFINED_5 ;
+							id_record_ex.a   					<= UNDEFINED_32;
+							id_record_ex.b   					<= UNDEFINED_32;
+							id_record_ex.dst 					<= UNDEFINED_32;
+							id_record_ex.immediate			<= UNDEFINED_32;
+							id_record_ex.branch_offset		<= UNDEFINED_32;										
+							id_record_ex.pc					<= UNDEFINED_32;
+			end case;		
+		end if;
 
-						
-			when 	OPCODE_STORE =>
-				
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.operand_A)));
-						id_record_ex.b   					<= UNDEFINED_32;
-						id_record_ex.dst 					<= register_array(TO_INTEGER(UNSIGNED(decoder_record_regfile.destination)));
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-									
-			
-			--Operation with registers and immediate values
-			when 	OPCODE_UMOV | OPCODE_SMOV	=>
-			
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= UNDEFINED_32;
-						id_record_ex.b   					<= UNDEFINED_32;
-						id_record_ex.dst 					<= ZERO_27 & decoder_record_regfile.destination;
-						id_record_ex.immediate			<= func_sign_extend(decoder_record_regfile.immediate);
-						id_record_ex.branch_offset		<= UNDEFINED_32;				
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-			
-			
-			-- BRANCH OPERATIONS
-			when 	OPCODE_BEQ | OPCODE_BGT | OPCODE_BHI | OPCODE_BAL | OPCODE_BLAL =>
-						
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= UNDEFINED_32;
-						id_record_ex.b   					<= UNDEFINED_32;
-						id_record_ex.dst 					<= UNDEFINED_32;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= func_offset_extend(decoder_record_regfile.offset);
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-						
-			when 	OPCODE_STOP =>
-						
-						id_record_ex.opcode     		<= decoder_record_regfile.opcode;
-						id_record_ex.a   					<= UNDEFINED_32;
-						id_record_ex.b   					<= UNDEFINED_32;
-						id_record_ex.dst 					<= UNDEFINED_32;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;		
-						id_record_ex.pc					<= decoder_record_regfile.PC;
-				
-			
-			--WHEN INSTRUCTION IS NOT VALID
-			when others =>	
-						id_record_ex.opcode     		<= UNDEFINED_5 ;
-						id_record_ex.a   					<= UNDEFINED_32;
-						id_record_ex.b   					<= UNDEFINED_32;
-						id_record_ex.dst 					<= UNDEFINED_32;
-						id_record_ex.immediate			<= UNDEFINED_32;
-						id_record_ex.branch_offset		<= UNDEFINED_32;										
-						id_record_ex.pc					<= UNDEFINED_32;
-			end case;
 		end process;
 			
 		process(record_in_crls.clk) begin

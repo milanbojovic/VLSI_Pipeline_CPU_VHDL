@@ -77,10 +77,8 @@ begin
 --		end if;
 --	end process;
 	
-	
-	
 	next_pc:
-	process(record_in_crls.clk) is
+	process(record_in_crls.clk, ex_record_if.flush_out) is
 	begin				
 			if rising_edge(record_in_crls.clk) then
 				reg_next_pc <= sig_next_pc;
@@ -89,14 +87,16 @@ begin
 	
 	
 	process_mux_logic:
-	process(ex_record_if.branch_cond, ex_record_if.pc, reg_pc) is
-	begin				
-		case (ex_record_if.branch_cond) is
-			when '0'	=>
-					sig_next_pc := signed(reg_pc) + 1;
-			when others =>
-					sig_next_pc := ex_record_if.pc;
-		end case;					
+	process(record_in_crls.clk) is
+	begin	
+		if(rising_edge(record_in_crls.clk)) then 
+			case (ex_record_if.branch_cond) is
+				when '0'	=>
+						sig_next_pc := signed(reg_pc) + 1;
+				when others =>
+						sig_next_pc := ex_record_if.pc;
+			end case;					
+		end if;
 	end process;	
 	
 end arch;

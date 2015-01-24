@@ -18,13 +18,13 @@ package cpu_lib is
 	subtype IMMEDIATE_TYPE			is STD_LOGIC_VECTOR(16 downto 0);	--17 bits
 	subtype REG_ADDR_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
 	subtype BRANCH_OFFSET_TYPE		is STD_LOGIC_VECTOR((REG_WIDTH - 6) downto 0);
-	subtype REG_TYPE 			is STD_LOGIC_VECTOR((REG_WIDTH - 1) downto 0);
-	subtype WORD_TYPE 			is STD_LOGIC_VECTOR((WORD_WIDTH - 1) downto 0);
-	subtype ADDR_TYPE			is WORD_TYPE;
-	subtype INSTR_TYPE			is WORD_TYPE;
-	subtype	SIGNAL_BIT_TYPE			is STD_LOGIC;
-	subtype	INSTR_CONTROL_TYPE		is STD_LOGIC_VECTOR(2 downto 0);
-	subtype	DATA_CONTROL_TYPE		is STD_LOGIC_VECTOR(3 downto 0);
+	subtype REG_TYPE 					is STD_LOGIC_VECTOR((REG_WIDTH - 1) downto 0);
+	subtype WORD_TYPE 				is STD_LOGIC_VECTOR((WORD_WIDTH - 1) downto 0);
+	subtype ADDR_TYPE					is WORD_TYPE;
+	subtype INSTR_TYPE				is WORD_TYPE;
+	subtype SIGNAL_BIT_TYPE			is STD_LOGIC;
+	subtype INSTR_CONTROL_TYPE		is STD_LOGIC_VECTOR(2 downto 0);
+	subtype DATA_CONTROL_TYPE		is STD_LOGIC_VECTOR(3 downto 0);
 
 	constant LINK_ADDR			: REG_TYPE 	:= "00000000000000000000000000011111";
 
@@ -104,7 +104,6 @@ package cpu_lib is
 	constant instr_input_file_path	: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_inst_in.txt";
 	constant data_input_file_path		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_data_in.txt";
 	constant expected_output_file		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/javni_test_out.txt";
-	constant actual_output_file		: STRING := "/home/milanbojovic/vhdl_workspace/vlsi_projkat/IO/generated_output.txt";
 
 	function read_pc_from_file return REG_TYPE;
 	function read_pc_plus_one_from_file return REG_TYPE;
@@ -120,6 +119,8 @@ package cpu_lib is
 	function DECODE_R2 (instruction: REG_TYPE) 			return REG_ADDR_TYPE;
 	function DECODE_IMMEDIATE (instruction: REG_TYPE) 	return IMMEDIATE_TYPE;
 	function DECODE_OFFSET (instruction: REG_TYPE) 		return BRANCH_OFFSET_TYPE;
+
+
 
 end cpu_lib;
 
@@ -166,6 +167,7 @@ package body cpu_lib is
 		file_close(input_file);
 		return pc_value1;
 	end;
+	
 
 	function func_sign_extend (op: IMMEDIATE_TYPE) return REG_TYPE is
 		variable result : REG_TYPE;
@@ -179,8 +181,8 @@ package body cpu_lib is
        end if;
 		return result;
     end func_sign_extend;
-	 
-	 
+
+
 	 function func_offset_extend (op: BRANCH_OFFSET_TYPE) return REG_TYPE is
 		variable result : REG_TYPE;
 	 begin
@@ -193,7 +195,7 @@ package body cpu_lib is
        end if;
 		return result;
     end func_offset_extend;
-	 
+
 
 	-- logical shift left
 	function DO_SHIFT_LL (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE is

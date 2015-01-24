@@ -26,6 +26,6 @@ architecture arch of MEM_WRAPPER is
 	signal sig_data_cache_record_mem	: DATACACHE_MEMPHASE_RCD;
 begin
 		COMP_MEM_PHASE : entity work.MEM_PHASE(arch) 	port map (record_in_crls, ex_record_mem, mem_record_wb, sig_mem_record_data_cache, sig_data_cache_record_mem);
-		COMP_DATA_CACHE: entity work.DATA_CACHE(arch) 	port map (record_in_crls, sig_mem_record_data_cache, sig_data_cache_record_mem);
+		--COMP_DATA_CACHE: entity work.DATA_CACHE(arch) 	port map (record_in_crls, sig_mem_record_data_cache, sig_data_cache_record_mem);
 end arch;
 

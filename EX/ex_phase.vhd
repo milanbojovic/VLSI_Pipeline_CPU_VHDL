@@ -97,13 +97,23 @@ begin
 		sig_regImm_to_muxB0			<= reg_immediate;
 		sig_rebBrOff_to_muxB1		<=	reg_branch_offset;
 		
-		ex_record_if.pc 				<= sig_alu_out;
 		ex_record_mem.alu_out 		<= sig_alu_out;
 		ex_record_mem.opcode  		<= sig_opcode;
-		
 		ex_record_if.branch_cond 	<= sig_cond;
 		ex_record_mem.dst				<= reg_destionation;
 		ex_record_mem.pc				<= reg_pc;
+	
+	--Process for setting signals which are not needed by certain instructions
+	process (record_in_crls.clk) begin
+		case reg_opcode is
+		
+			when OPCODE_BEQ | OPCODE_BGT | OPCODE_BHI | OPCODE_BAL | OPCODE_BLAL =>
+				ex_record_if.pc 		<= sig_alu_out;
+			when others =>
+				ex_record_if.pc 		<= UNDEFINED_32;
+		end case;					
+	end process;
+	
 		
 	process (record_in_crls.load, record_in_crls.reset) begin 
 		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') then 		

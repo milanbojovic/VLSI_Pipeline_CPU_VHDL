@@ -88,5 +88,6 @@ begin
 			wb_record_id.reg_adr			<= UNDEFINED_32;
 			wb_record_id.write_enable	<= '0';
 		end if;
-	end process;	
+	end process;
+	
 end arch;

@@ -14,14 +14,17 @@ entity DATA_CACHE is
     (
 		-- Input ports
 		record_in_crls : in CRLS_RCD;
-		mem_record_data_cache	: in   MEMPHASE_DATACACHE_RCD;
+		mem_record_data_cache	: in  MEMPHASE_DATACACHE_RCD;
+		
+		id_record_control			: in 	ID_MEM_RCD;
 		
 		-- Output ports	
-		data_cache_record_mem	: out  DATACACHE_MEMPHASE_RCD
+		data_cache_record_mem	: out	DATACACHE_MEMPHASE_RCD
     );
 end DATA_CACHE;
 
-architecture arch of DATA_CACHE is	
+architecture arch of DATA_CACHE is
+
 	function init_cache return DATA_CACHE_TYPE is 
 		file 		input_file					: text;
 		variable input_line					: line;
@@ -48,7 +51,39 @@ architecture arch of DATA_CACHE is
 		return tmp_mem;
 	end;
 	
-	shared variable data_cache: DATA_CACHE_TYPE := init_cache;
+		shared variable data_cache: DATA_CACHE_TYPE := init_cache;
+		
+--	-- Function for memory testing !!!
+	procedure test_mem_procedure is
+
+		file 		content			 : text;
+		variable current_line	 : line;
+		variable addr, data : WORD_TYPE;
+		
+		begin
+		
+			file_open(content, expected_output_file, read_mode);
+		
+			report "TEST MEMORY FUNCTION !!  SUCCESS!";
+			
+			loop
+				exit when endfile(content);
+
+				READLINE(content, current_line);
+
+				HREAD(current_line, addr);
+				READ(current_line, data);
+
+				assert data = data_cache(TO_INTEGER(UNSIGNED(addr(ADDR_WIDTH - 1 downto 0))));
+				report "Result mismatch!"
+				severity ERROR;
+			end loop;
+
+			file_close(content);
+
+			report "Test end!";
+		end;
+	
 	
 begin	
 	-- Checking control lines:
@@ -76,6 +111,13 @@ begin
 						data_cache_record_mem.dataOut	<= UNDEFINED_32;
 			end case;
 		
+		end if;
+	end process;
+	
+	mem_test:process (id_record_control.halt) is
+	begin
+		if (rising_edge(id_record_control.halt)) then
+			--test_mem_procedure;
 		end if;
 	end process;
 	

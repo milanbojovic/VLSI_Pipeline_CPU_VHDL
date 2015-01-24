@@ -66,6 +66,13 @@ package CPU_PKG is
 		write_enable	: SIGNAL_BIT_TYPE;
 	end record;	
 	
+	-- Record for one way conection(CTRL_UNIT --> WB)
+	type ID_MEM_RCD is record
+		halt : SIGNAL_BIT_TYPE;
+	end record;	
+	
+	
+	
 	
 	--INSTRUCTION DECODE & REGISTER FILE CONNECTIONS
 	-- Record for one way connection of INSTRUCTION DECODER with REGISTER FILE (DECODER-> REGISTER_FILE)

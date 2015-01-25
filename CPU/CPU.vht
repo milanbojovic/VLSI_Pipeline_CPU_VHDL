@@ -62,10 +62,10 @@ END PROCESS;
 	
 always : PROCESS
 BEGIN
-  report "Simulation started !!!";
+  report "[TESTBENCH] - Simulation started!";
   
   
-  wait for 100 ns;
+  wait for 400 ns;
                                              
 END PROCESS always;
 

@@ -56,15 +56,22 @@ architecture arch of DATA_CACHE is
 --	-- Function for memory testing !!!
 	procedure test_mem_procedure is
 
-		file 		content			 : text;
-		variable current_line	 : line;
-		variable addr, data : WORD_TYPE;
+		file 		content												: text;
+		variable current_line										: line;
+		variable addr, data 											: WORD_TYPE;
+		variable expected_data, data_cache_data				: WORD_TYPE;
+		
+		variable int_data, int_addr								: integer;
+		variable test_result											: integer := 1;
+		variable int_expected_data, int_data_cache_data		: integer;
+
 		
 		begin
 		
 			file_open(content, expected_output_file, read_mode);
 		
-			report "TEST MEMORY FUNCTION !!  SUCCESS!";
+			report 	"                                                                            "&
+						"[TEST MEMORY FUNCTION] - Memory test started:";
 			
 			loop
 				exit when endfile(content);
@@ -72,18 +79,43 @@ architecture arch of DATA_CACHE is
 				READLINE(content, current_line);
 
 				HREAD(current_line, addr);
-				READ(current_line, data);
-
-				assert data = data_cache(TO_INTEGER(UNSIGNED(addr(ADDR_WIDTH - 1 downto 0))));
-				report "Result mismatch!"
+				READ(current_line, expected_data);
+				
+				
+				int_addr 				:= TO_INTEGER(UNSIGNED(addr(addr'RANGE))) ;
+				
+				data_cache_data		:= data_cache(int_addr) ;
+				
+				int_expected_data		:= TO_INTEGER(UNSIGNED(expected_data(expected_data'RANGE))) ; 
+				int_data_cache_data	:= TO_INTEGER(UNSIGNED(data_cache_data(data_cache_data'RANGE))) ; 
+									
+				report "                                                                            "&
+						 "[TEST MEMORY FUNCTION]         memory(" 	& integer'image(int_addr) & ") = " 	 & integer'image(int_data_cache_data) &
+						 "  -->  expected(" & integer'image(int_expected_data) & ")";
+				
+				assert expected_data = data_cache_data
+				report 	"                                                                           "&
+							"[TEST MEMORY FUNCTION]         Error at memory(" & integer'image(int_addr) & ")"
 				severity ERROR;
+				
+				if (expected_data /= data_cache_data) and test_result = 1 then 
+					test_result := 0;
+				end if;				
 			end loop;
 
 			file_close(content);
+			
+			if test_result = 1 then 
+					report 	"                                                                            "&
+								"[TEST MEMORY FUNCTION] - Test status: SUCCESS ";
+			else 
+					report 	"                                                                            "&					
+								"[TEST MEMORY FUNCTION] - Test status:  FAIL";
+			end if;
 
-			report "Test end!";
+			report 	"                                                                            "&
+						"[TEST MEMORY FUNCTION] - Memory test FINISHED";
 		end;
-	
 	
 begin	
 	-- Checking control lines:
@@ -114,10 +146,16 @@ begin
 		end if;
 	end process;
 	
-	mem_test:process (record_in_crls.clk) is
+	mem_test:process (record_in_crls.clk, record_in_crls.reset) is
+		variable isExecuted : integer := 0;
 	begin
-		if (rising_edge(record_in_crls.clk) and opcode = OPCODE_STOP) then
-			--test_mem_procedure;
+		if (rising_edge(record_in_crls.reset)) then
+			isExecuted := 0;
+		elsif (rising_edge(record_in_crls.clk) and opcode = OPCODE_STOP) then
+			if(isExecuted = 0) then 				
+				test_mem_procedure;
+				isExecuted := 1;
+			end if;
 		end if;
 	end process;
 	

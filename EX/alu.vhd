@@ -46,8 +46,8 @@ end entity ALU;
 
 architecture arch of ALU is
 
-	shared variable result_out : REG_TYPE;
-	shared variable carry, overflow, negative, zero: SIGNAL_BIT_TYPE;
+	shared variable result_out : REG_TYPE := "00000000000000000000000000000000";
+	shared variable carry, overflow, negative, zero: SIGNAL_BIT_TYPE := '0';
 
 	-- logical and operation
 	function DO_AND(a, b : REG_TYPE)	return REG_TYPE is
@@ -138,8 +138,8 @@ architecture arch of ALU is
 	procedure SET_FLAGS(a, b, result : REG_TYPE;
 						opcode 	: OPCODE_TYPE;
 						overflow_out, zero_out, negative_out, carry_out : out SIGNAL_BIT_TYPE) is
-		variable msb_a, msb_b, msb_res: SIGNAL_BIT_TYPE;
-		variable ext_a, ext_b, ext_result : STD_LOGIC_VECTOR (32 downto 0);
+		variable msb_a, msb_b, msb_res: SIGNAL_BIT_TYPE := '0';
+		variable ext_a, ext_b, ext_result : STD_LOGIC_VECTOR (32 downto 0) := "000000000000000000000000000000000";
 	begin
 		msb_a := a(REG_TYPE'length - 1);
 		msb_b := b(REG_TYPE'length - 1);

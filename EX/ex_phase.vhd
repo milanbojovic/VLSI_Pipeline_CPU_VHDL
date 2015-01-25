@@ -56,7 +56,8 @@ architecture arch of EX_PHASE is
 	
 	signal sig_opcode					: OPCODE_TYPE;
 	signal sig_cond 					: SIGNAL_BIT_TYPE;
-	signal sig_flush_out				: SIGNAL_BIT_TYPE;
+	
+	signal sig_record_control_out	: EX_CONTROL_FLUSH_HALT_OUT;
 	
 	--Ako me ne bude mrzelo mogu da pretvorim signale n, z, v, c u rekorde ako sto je zakomentarisano ovde ispod
 	--signal sig_record_csr_out	: CSR_RCD;
@@ -91,9 +92,9 @@ begin
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out
 																						);
 																					
-		COMP_CONTROL_UNIT	: entity work.CONTROL_UNIT(arch) port map (sig_opcode, 
+		COMP_CONTROL_UNIT	: entity work.CONTROL_UNIT(arch) port map (record_in_crls, sig_opcode, 
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
-																						 sig_branch_instruction, sig_Imm, sig_cond, sig_flush_out
+																						 sig_branch_instruction, sig_Imm, sig_cond, sig_record_control_out
 																						);
 		sig_opcode <= reg_opcode;
 		sig_regPc_to_muxA 			<= reg_pc;
@@ -108,9 +109,11 @@ begin
 		ex_record_mem.pc				<= reg_pc;
 		
 		ex_record_if.branch_cond 	<= sig_cond;
-		ex_record_if.flush_out		<= sig_flush_out;
+		ex_record_if.flush_out		<= sig_record_control_out.flush_out;
+		ex_record_if.halt_out		<= sig_record_control_out.halt_out;
 		
-		ex_record_id.flush_out		<= sig_flush_out;
+		ex_record_id.flush_out		<= sig_record_control_out.flush_out;
+
 
 
 	

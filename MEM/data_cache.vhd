@@ -13,10 +13,10 @@ entity DATA_CACHE is
   port
     (
 		-- Input ports
-		record_in_crls : in CRLS_RCD;
+		record_in_crls 			: in	CRLS_RCD;
 		mem_record_data_cache	: in  MEMPHASE_DATACACHE_RCD;
 		
-		id_record_control			: in 	ID_MEM_RCD;
+		opcode					 	: in  OPCODE_TYPE;
 		
 		-- Output ports	
 		data_cache_record_mem	: out	DATACACHE_MEMPHASE_RCD
@@ -114,9 +114,9 @@ begin
 		end if;
 	end process;
 	
-	mem_test:process (id_record_control.halt) is
+	mem_test:process (record_in_crls.clk) is
 	begin
-		if (rising_edge(id_record_control.halt)) then
+		if (rising_edge(record_in_crls.clk) and opcode = OPCODE_STOP) then
 			--test_mem_procedure;
 		end if;
 	end process;

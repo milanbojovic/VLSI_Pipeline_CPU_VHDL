@@ -4,19 +4,21 @@ library WORK;
 
 use IEEE.STD_LOGIC_1164.all;
 use WORK.CPU_LIB.all;
+use WORK.CPU_PKG.all;
 
 entity CONTROL_UNIT is
   port
     (
 		-- Input ports
-		opcode : OPCODE_TYPE;
-		N, C, V, Z: std_logic;
+		record_in_crls 			: in CRLS_RCD;
+		opcode 						: in OPCODE_TYPE;
+		N, C, V, Z					: in std_logic;
 		
 		-- Output ports		
-		branch_instruction: 	out SIGNAL_BIT_TYPE;
-		imm : 					out SIGNAL_BIT_TYPE;
-		branch_cond:			out SIGNAL_BIT_TYPE;
-		flush_out:				out SIGNAL_BIT_TYPE
+		branch_instruction: 		out SIGNAL_BIT_TYPE;
+		imm : 						out SIGNAL_BIT_TYPE;
+		branch_cond:				out SIGNAL_BIT_TYPE;
+		sig_record_control_out:	out EX_CONTROL_FLUSH_HALT_OUT
 		
     );
 end CONTROL_UNIT;
@@ -48,47 +50,70 @@ begin
 	end process;
 	
 	
-	set_branch_cond:
-	process(opcode, N, C, V, Z) is		
+	set_control_signals:
+	process(opcode, N, C, V, Z, record_in_crls.clk, record_in_crls.reset) is		
 	begin
-		case opcode is
-				when OPCODE_BEQ =>
-					if(Z = '1') then
-						branch_cond <= '1';
-						flush_out	<= '1';
-						
-					else
-						branch_cond <= '0';
-						flush_out	<= '0';
-					end if;
-				when OPCODE_BGT =>
-					if(N = V and Z = '0') then
-						branch_cond <= '1';
-						flush_out	<= '1';						
-					else
-						branch_cond <= '0';
-						flush_out	<= '0';						
-					end if;
-				when OPCODE_BHI =>
-					if(C = '0' and Z = '0') then
-						branch_cond <= '1';
-						flush_out	<= '1';
-					else
-						branch_cond <= '0';
-						flush_out	<= '0';
-					end if;
-					
-				when OPCODE_BAL =>
-					branch_cond <= '1';
-					flush_out	<= '1';
-					
-				when OPCODE_BLAL =>
-					branch_cond <= '1';
-					flush_out	<= '1';
-				when others =>
+			if rising_edge(record_in_crls.clk) then 
+				if record_in_crls.reset = '1' then
 					branch_cond <= '0';
-					flush_out	<= '0';
-			end case;
+					sig_record_control_out.flush_out	<= '0';
+					sig_record_control_out.halt_out	<= '0';
+					
+				else
+					case opcode is
+						when OPCODE_BEQ =>
+							if(Z = '1') then
+								branch_cond <= '1';
+								sig_record_control_out.flush_out	<= '1';
+								sig_record_control_out.halt_out	<= '0';
+								
+							else
+								branch_cond <= '0';
+								sig_record_control_out.flush_out	<= '0';
+								sig_record_control_out.halt_out	<= '0';
+							end if;
+						when OPCODE_BGT =>
+							if(N = V and Z = '0') then
+								branch_cond <= '1';
+								sig_record_control_out.flush_out	<= '1';						
+								sig_record_control_out.halt_out	<= '0';
+							else
+								branch_cond <= '0';
+								sig_record_control_out.flush_out	<= '0';						
+								sig_record_control_out.halt_out	<= '0';
+							end if;
+						when OPCODE_BHI =>
+							if(C = '0' and Z = '0') then
+								branch_cond <= '1';
+								sig_record_control_out.flush_out	<= '1';
+								sig_record_control_out.halt_out	<= '0';
+							else
+								branch_cond <= '0';
+								sig_record_control_out.flush_out	<= '0';
+								sig_record_control_out.halt_out	<= '0';
+							end if;
+							
+						when OPCODE_BAL =>
+							branch_cond <= '1';
+							sig_record_control_out.flush_out	<= '1';
+							sig_record_control_out.halt_out	<= '0';
+							
+						when OPCODE_BLAL =>
+							branch_cond <= '1';
+							sig_record_control_out.flush_out	<= '1';
+							sig_record_control_out.halt_out	<= '0';
+						
+						when OPCODE_STOP =>
+							branch_cond <= '0';
+							sig_record_control_out.flush_out	<= '1';
+							sig_record_control_out.halt_out	<= '1';
+						when others =>
+							branch_cond <= '0';
+							sig_record_control_out.flush_out	<= '0';
+							-- HALT should not be changed because when CPU is halted it should not continue to process instrucitons
+					end case;
+				end if;
+			end if;
 	end process;
 	
 end arch;

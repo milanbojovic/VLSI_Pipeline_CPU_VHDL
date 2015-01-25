@@ -24,10 +24,7 @@ entity ID_PHASE is
 		ex_record_id			: 	in EX_ID_RCD;
 		-- Output ports
 		--EX phase
-		id_record_ex			: 	out ID_EX_RCD;
-		
-		id_record_control		: 	out ID_MEM_RCD
-		
+		id_record_ex			: 	out ID_EX_RCD
 	);
 
 end ID_PHASE;
@@ -47,6 +44,11 @@ begin
 				reg_pc	<= if_record_id.pc;
 				reg_ir1	<= if_record_id.ir1;
 				reg_ir2	<= if_record_id.ir2;
+				
+		elsif (record_in_crls.reset = '1') then
+				reg_pc	<= UNDEFINED_32;
+				reg_ir1	<= UNDEFINED_32;
+				reg_ir2	<= UNDEFINED_32;		
 		end if;
 	end process;
 		
@@ -67,19 +69,6 @@ begin
 						ex_record_id				=> ex_record_id,
 						id_record_ex				=> id_record_ex
 					 );
-					 
-		
-	-- REMOVE ME LATER PLEASE !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	-- THIS FUNCTIONALITY SHOULD BE MOVED TO CONTROL UNIT !!!!!!!!!!!!!!!!
-	-- remove signal 
-	process (decoder_record_regfile.opcode) begin 
-		if (decoder_record_regfile.opcode = OPCODE_STOP) then 		
-				id_record_control.halt <= '1';
-		else 
-				id_record_control.halt <= '0';
-		end if;
-	end process;
-	
 	
 end arch;
 

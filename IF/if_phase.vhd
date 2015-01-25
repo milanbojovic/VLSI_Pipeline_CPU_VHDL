@@ -45,7 +45,7 @@ begin
 	process(record_in_crls.clk, ex_record_if.flush_out) is 
 	begin 	
 		if rising_edge(record_in_crls.clk) then
-			if (ex_record_if.flush_out = '1') then
+			if (ex_record_if.flush_out = '1' or ex_record_if.halt_out = '1') then
 				if_record_id.pc						<= UNDEFINED_32;
 				if_record_id.ir1						<= UNDEFINED_32;
 				if_record_id.ir2						<= UNDEFINED_32;
@@ -59,30 +59,24 @@ begin
 		
 		
 	pc_register:
-	process(record_in_crls.clk, record_in_crls.load, record_in_crls.reset) is 
-	begin 	
+	process(record_in_crls.load, record_in_crls.reset, ex_record_if.halt_out, record_in_crls.clk) is 
+	begin
 		if rising_edge(record_in_crls.clk) then
-			if (record_in_crls.load = '1') then
-					reg_pc <= reg_next_pc;
+			if (record_in_crls.reset = '1') then
+				reg_pc <= read_pc_from_file;
+			elsif (record_in_crls.load = '1' and  ex_record_if.halt_out /= '1') then
+				reg_pc <= reg_next_pc;
 			end if;
 		end if;
 	end process;
 	
 	
---	proc_reset:
---	process(record_in_crls.reset) is 
---	begin 	
---		if(record_in_crls.reset = '1') then
---			reg_pc <= read_pc_from_file;
---		end if;
---	end process;
-	
 	next_pc:
-	process(record_in_crls.clk, ex_record_if.flush_out) is
+	process(record_in_crls.clk, ex_record_if.halt_out) is
 	begin				
-			if rising_edge(record_in_crls.clk) then
-				reg_next_pc <= sig_next_pc;
-			end if;
+		if (rising_edge(record_in_crls.clk) and  ex_record_if.halt_out /= '1') then
+			reg_next_pc <= sig_next_pc;
+		end if;
 	end process;	
 	
 	

@@ -38,6 +38,7 @@ package CPU_PKG is
 		pc				: REG_TYPE;
 		branch_cond	: SIGNAL_BIT_TYPE;
 		flush_out	: SIGNAL_BIT_TYPE;
+		halt_out		: SIGNAL_BIT_TYPE;
 	end record;
 	
 	
@@ -73,13 +74,6 @@ package CPU_PKG is
 		write_enable	: SIGNAL_BIT_TYPE;
 	end record;	
 	
-	-- Record for one way conection(CTRL_UNIT --> WB)
-	type ID_MEM_RCD is record
-		halt : SIGNAL_BIT_TYPE;
-	end record;	
-	
-	
-	
 	
 	--INSTRUCTION DECODE & REGISTER FILE CONNECTIONS
 	-- Record for one way connection of INSTRUCTION DECODER with REGISTER FILE (DECODER-> REGISTER_FILE)
@@ -91,6 +85,13 @@ package CPU_PKG is
 		destination 	: REG_ADDR_TYPE; 				-- Register index in the register file where the result will be put
 		offset 			: BRANCH_OFFSET_TYPE;		-- Address offset with branch instructions	
 		pc					: REG_TYPE;
+	end record;	
+	
+	
+	-- Record for one way connection of If phase with Instruction Cache(INSTR_CACHE -> IF_PHASE)
+	type EX_CONTROL_FLUSH_HALT_OUT is record
+		flush_out		: SIGNAL_BIT_TYPE;
+		halt_out 		: SIGNAL_BIT_TYPE;
 	end record;	
 	
 	

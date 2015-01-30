@@ -13,6 +13,10 @@ entity EX_PHASE is
 		record_in_crls 		: in CRLS_RCD;		--Clock, Reset, Load, Store		
 		id_record_ex			: in ID_EX_RCD;
 		
+		--NOVI REKORDI
+		wb_record_ex			: in WB_EX_RCD;
+		mem_record_ex			: in MEM_EX_RCD;
+		
 		-- Output ports
 		-- IF_PHASE
 		ex_record_if			: out EX_IF_RCD;
@@ -33,7 +37,9 @@ architecture arch of EX_PHASE is
 	signal reg_immediate				: REG_TYPE;
 	signal reg_branch_offset		: REG_TYPE;
 	signal reg_destionation			: REG_TYPE;
-	
+	signal reg_index_a				: REG_ADDR_TYPE;
+	signal reg_index_b				: REG_ADDR_TYPE;
+	signal reg_index_dst				: REG_ADDR_TYPE;
 	-- SIGNALS
 	-- Mux_A
 	signal sig_regA_to_muxA			: REG_TYPE;
@@ -107,6 +113,7 @@ begin
 		ex_record_mem.opcode  		<= sig_opcode;
 		ex_record_mem.dst				<= reg_destionation;
 		ex_record_mem.pc				<= reg_pc;
+		ex_record_mem.index_dst		<= reg_index_dst;
 		
 		ex_record_if.branch_cond 	<= sig_cond;
 		ex_record_if.flush_out		<= sig_record_control_out.flush_out;
@@ -134,10 +141,13 @@ begin
 			reg_opcode 			<= id_record_ex.opcode;
 			reg_pc				<=	id_record_ex.pc;
 			reg_a					<=	id_record_ex.a;
+			reg_index_a			<= id_record_ex.index_a;
 			reg_b					<=	id_record_ex.b;
+			reg_index_b			<= id_record_ex.index_b;
 			reg_immediate		<=	id_record_ex.immediate;
 			reg_branch_offset	<=	id_record_ex.branch_offset;
-			reg_destionation	<= id_record_ex.dst;				
+			reg_destionation	<= id_record_ex.dst;
+			reg_index_dst		<= id_record_ex.index_dst;
 			
 		elsif	(record_in_crls.reset = '1') then
 			reg_opcode 			<= UNDEFINED_5	;
@@ -146,7 +156,10 @@ begin
 			reg_b					<=	UNDEFINED_32;
 			reg_immediate		<=	UNDEFINED_32;
 			reg_branch_offset	<=	UNDEFINED_32;
-			reg_destionation	<= UNDEFINED_32;	
+			reg_destionation	<= UNDEFINED_32;
+			reg_index_a       <= UNDEFINED_5;
+			reg_index_b 		<= UNDEFINED_5;
+			reg_index_dst		<= UNDEFINED_5;
 
 		end if;
 	end process;

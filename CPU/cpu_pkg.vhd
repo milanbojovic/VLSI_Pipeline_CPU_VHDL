@@ -53,9 +53,21 @@ package CPU_PKG is
 		opcode		: OPCODE_TYPE;
 		pc 			: REG_TYPE;
 		alu_out		: REG_TYPE;
-		dst	: REG_TYPE;
+		dst			: REG_TYPE;
+		dst_index	: REG_ADDR_TYPE;
 	end record;
 	
+	-- Record for one way connection (MEM --> EX)
+	type MEM_EX_RCD is record
+		dst			: REG_TYPE;
+		index_dst 	: REG_ADDR_TYPE;
+	end record;
+	
+	--Record for one way connection (WB --> EX)
+	type WB_EX_RCD is record
+		dst			: REG_TYPE;
+		index_dst	: REG_ADDR_TYPE;
+	end record;
 	
 	-- Record for one way conection(MEM --> WB)
 	type MEM_WB_RCD is record
@@ -65,7 +77,6 @@ package CPU_PKG is
 		dst		: REG_TYPE;
 		pc			: REG_TYPE;
 	end record;
-	
 	
 	-- Record for one way conection(WB --> ID)
 	type WB_ID_RCD is record

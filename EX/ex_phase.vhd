@@ -26,6 +26,7 @@ entity EX_PHASE is
 		
 		-- MEM_PHASE
 		ex_record_mem			: out EX_MEM_RCD
+		
 	);
 end EX_PHASE;
 
@@ -93,19 +94,21 @@ begin
 																						 sig_csr_negative_in, sig_csr_carry_in, sig_csr_overflow_in, sig_csr_zero_in
 																						);
 																					
-		COMP_CSR_REG		: entity work.CSR(arch) 			port map (record_in_crls.load, record_in_crls.reset, 
+		COMP_CSR_REG			: entity work.CSR(arch) 		port map (record_in_crls.load, record_in_crls.reset, 
 																						 sig_csr_negative_in,  sig_csr_carry_in,  sig_csr_overflow_in,  sig_csr_zero_in,
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out
 																						);
 																					
-		COMP_CONTROL_UNIT	: entity work.CONTROL_UNIT(arch) port map (record_in_crls, sig_opcode, 
-																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
-																						 sig_branch_instruction, sig_Imm, sig_cond, sig_record_control_out
-																						);
-		sig_opcode <= reg_opcode;
+		COMP_FORWARDING_UNIT : entity work.FORWARDING_UNIT (arch) port map ( record_in_crls,mem_record_ex,wb_record_ex,
+																									sig_opcode,
+																									reg_index_a, reg_index_b, reg_index_dst, reg_a, reg_b,	
+																									sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
+																									sig_branch_instruction, sig_Imm, sig_cond, sig_record_control_out, 
+																									sig_regA_to_muxA, sig_regB_to_muxB0
+																								 );
+																						
+		sig_opcode 						<= reg_opcode;
 		sig_regPc_to_muxA 			<= reg_pc;
-		sig_regA_to_muxA 				<= reg_a;
-		sig_regB_to_muxB0				<= reg_b;
 		sig_regImm_to_muxB0			<= reg_immediate;
 		sig_rebBrOff_to_muxB1		<=	reg_branch_offset;
 		
@@ -120,8 +123,6 @@ begin
 		ex_record_if.halt_out		<= sig_record_control_out.halt_out;
 		
 		ex_record_id.flush_out		<= sig_record_control_out.flush_out;
-
-
 
 	
 	--Process for setting signals which are not needed by certain instructions

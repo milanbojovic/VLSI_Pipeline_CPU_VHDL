@@ -124,8 +124,6 @@ package cpu_lib is
 	function DECODE_IMMEDIATE (instruction: REG_TYPE) 	return IMMEDIATE_TYPE;
 	function DECODE_OFFSET (instruction: REG_TYPE) 		return BRANCH_OFFSET_TYPE;
 
-
-
 end cpu_lib;
 
 package body cpu_lib is
@@ -204,7 +202,7 @@ package body cpu_lib is
        end if;
 		return result;
     end func_offset_extend;
-
+	
 
 	-- logical shift left
 	function DO_SHIFT_LL (operand: REG_TYPE; count : REG_TYPE) return REG_TYPE is

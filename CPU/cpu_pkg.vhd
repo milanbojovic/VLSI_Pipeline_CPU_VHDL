@@ -29,7 +29,10 @@ package CPU_PKG is
 		a, b				: REG_TYPE;
 		immediate		: REG_TYPE;
 		branch_offset	: REG_TYPE;
-		dst				: REG_TYPE;		
+		dst				: REG_TYPE;
+		index_a			: REG_ADDR_TYPE;
+		index_b			: REG_ADDR_TYPE;
+		index_dst		: REG_ADDR_TYPE;
 	end record;
 	
 	
@@ -54,7 +57,7 @@ package CPU_PKG is
 		pc 			: REG_TYPE;
 		alu_out		: REG_TYPE;
 		dst			: REG_TYPE;
-		dst_index	: REG_ADDR_TYPE;
+		index_dst	: REG_ADDR_TYPE;
 	end record;
 	
 	-- Record for one way connection (MEM --> EX)
@@ -76,6 +79,7 @@ package CPU_PKG is
 		lmd		: REG_TYPE;
 		dst		: REG_TYPE;
 		pc			: REG_TYPE;
+		index_dst: REG_ADDR_TYPE;
 	end record;
 	
 	-- Record for one way conection(WB --> ID)

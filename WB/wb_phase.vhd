@@ -76,7 +76,7 @@ begin
 						wb_record_id.reg_adr			<= reg_dst;
 						wb_record_id.write_enable	<= '1';
 						wb_record_ex.dst				<= reg_lmd;
-						wb_record_ex.index_dst		<= reg_dst;
+						wb_record_ex.index_dst		<= reg_dst(4 downto 0);
 					when OPCODE_BLAL =>
 						wb_record_id.data				<= reg_pc;
 						wb_record_id.reg_adr			<= LINK_ADDR;   -- Reg 31 (link reg)

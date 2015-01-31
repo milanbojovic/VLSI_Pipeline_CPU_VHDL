@@ -18,6 +18,9 @@ entity MEM_PHASE is
 
 		-- WB Phase
 		mem_record_wb			: out MEM_WB_RCD;
+		
+		-- MEM -> EX_Phase
+		mem_record_ex			: out MEM_EX_RCD;
 
 		-- DATA CACHE CONNECTIONS
 
@@ -33,6 +36,7 @@ architecture arch of MEM_PHASE is
 	shared variable reg_pc						: REG_TYPE;
 	shared variable reg_alu_out				: REG_TYPE;
 	shared variable reg_dest					: REG_TYPE;
+	shared variable reg_index_dst				: REG_ADDR_TYPE;
 	shared variable reg_lmd						: REG_TYPE := UNDEFINED_32;
 
 begin	
@@ -41,16 +45,18 @@ begin
 	process (record_in_crls.load, record_in_crls.reset) begin
 
 		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') then
-			reg_opcode 			:= ex_record_mem.opcode;
-			reg_pc				:=	ex_record_mem.pc;
-			reg_alu_out			:=	ex_record_mem.alu_out;
-			reg_dest				:=	ex_record_mem.dst;
+			reg_opcode 						:= ex_record_mem.opcode;
+			reg_pc							:=	ex_record_mem.pc;
+			reg_alu_out						:=	ex_record_mem.alu_out;
+			reg_dest							:=	ex_record_mem.dst;
+			reg_index_dst					:= ex_record_mem.index_dst;
 
 		elsif record_in_crls.reset = '1' then
 			reg_opcode 			:= UNDEFINED_5;
 			reg_pc				:=	UNDEFINED_32;
 			reg_alu_out			:=	UNDEFINED_32;
 			reg_dest				:=	UNDEFINED_32;
+			reg_index_dst		:= UNDEFINED_5;
 		end if;
 	end process;
 
@@ -89,19 +95,25 @@ begin
 					reg_lmd := UNDEFINED_32;
 			end if;
 			--Signals to register connections
-			mem_record_wb.opcode <= reg_opcode;
-			mem_record_wb.dst 	<= reg_dest;
-			mem_record_wb.alu_out<= reg_alu_out;
-			mem_record_wb.lmd 	<= reg_lmd;
-			mem_record_wb.pc		<= reg_pc;
+			mem_record_wb.opcode 		<= reg_opcode;
+			mem_record_wb.dst 			<= reg_dest;
+			mem_record_wb.alu_out		<= reg_alu_out;
+			mem_record_wb.lmd 			<= reg_lmd;
+			mem_record_wb.pc				<= reg_pc;
+			
+			mem_record_ex.index_dst		<= reg_index_dst;
+			mem_record_ex.dst				<= reg_alu_out;
 
 		elsif record_in_crls.reset = '1' then
 		--RESET
-			mem_record_wb.opcode <= UNDEFINED_5;
-			mem_record_wb.dst 	<= UNDEFINED_32;
-			mem_record_wb.alu_out<= UNDEFINED_32;
-			mem_record_wb.lmd 	<= UNDEFINED_32;
-			mem_record_wb.pc		<= UNDEFINED_32;
+			mem_record_wb.opcode 		<= UNDEFINED_5;
+			mem_record_wb.dst 			<= UNDEFINED_32;
+			mem_record_wb.alu_out		<= UNDEFINED_32;
+			mem_record_wb.lmd 			<= UNDEFINED_32;
+			mem_record_wb.pc				<= UNDEFINED_32;
+			
+			mem_record_ex.index_dst		<= UNDEFINED_5;
+			mem_record_ex.dst				<= UNDEFINED_32;
 		end if;
 	end process;
 

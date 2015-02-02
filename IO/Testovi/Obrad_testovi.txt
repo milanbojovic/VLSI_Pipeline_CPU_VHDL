@@ -1,0 +1,21 @@
+ ; org 1 
+00000001 00000000100000100011000000000000 ; and r1 r2 r3 	 ; dst = 1;  a = 3;  b = 4; 	BUG!
+00000002 00001001010011000100000000000000 ; sub r6 r5 r4 	 ; dst = 6;  a = 6;  b = 5; 	OK!
+00000003 00010010000011101001000000000000 ; add r7 r8 r9 	 ; dst = 7;  a = 9;  b = 10;       	OK!
+00000004 00011010110101001100000000000000 ; adc r10 r11 r12  ; dst = 10; a = 12; b = 13; OK! 
+00000005 00101100010000010001000000000000 ; cmp r17 r17; 	 ; dst = 0;  a = 18; b = 18;  OK! da li dst treba da bude 0 kod CMP operacije???		
+00000006 11000000000000000000000000000010 ; beq 002 		 ; opcode ne valja; offfset ne valja
+00000007 00110101001001110101000000000000 ; ssub r19 r20 r21 ; dst = 19; a = 21; b = 22; OK!
+00000008 00111101111011011000000000000000 ; sadd r22 r23 r24 ; dst = 22; a = 24; b = 25; OK!
+00000009 01000110101100111011000000000000 ; sadc r25 r26 r27 ; dst = 25; a = 27; b = 28; OK!
+0000000a 01001111011110011110000000000000 ; ssbc r28 r29 r30 ; dst = 28; a = 30; b = 31; OK!
+0000000b 01010000000000100010000000000000 ; mov r1 r2 		 ; dst = 1;  a = undefined; b = 3; proveri koji se salju kod mov;
+0000000c 01011000000010000101000000000000 ; not r4 r5 		 ; dst = 4;  a = undefined; b = 6; Ok je samo reci bojketu da prosledjuje undefined za operande koji se ne koriste!!!
+0000000d 01100010010011101000000000000000 ; sl r7 r9 r8 	 ; dst = 7;  a = 10; b = 9; OK! BUG u generatoru testova, zameni operande u binarnoj reprezentaciji instrukcije ali nas pipeline radi! :)  
+0000000e 01101011000101001011000000000000 ; sr r10 r11 r12   ; dst = 10; a = 12; b = 13; OK! isto kao i za sl 
+0000000f 01110011110110101110000000000000 ; asr r13 r14 r15  ; dst = 13; a = 16; b = 15; OK! isto kao i za sve shift operacije
+00000010 01111000001000000000000000000000 ; movi r16 0 		 ; dst = 16; immediate = 0; OK! na ostale operande salje x a bolje bi bilo da je undefined
+00000011 10100100100000100000000000000000 ; load r1 r18      ; dst = 1;  a = 19; b = 1; OK! na B salje 1 sto ne smeta ali bolje undefined 
+00000012 10101000100001100000000000000000 ; store r2 r3 	 ; dst = 4;  a = 3;  b = x; OK!
+00000013 11111000000000000000000000000000 ; stop 			 ; stop !!!
+ ;  

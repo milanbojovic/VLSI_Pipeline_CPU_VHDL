@@ -100,6 +100,7 @@ begin
 			mem_record_wb.alu_out		<= reg_alu_out;
 			mem_record_wb.lmd 			<= reg_lmd;
 			mem_record_wb.pc				<= reg_pc;
+			mem_record_wb.index_dst		<= reg_index_dst;
 			
 			mem_record_ex.index_dst		<= reg_index_dst;
 			mem_record_ex.dst				<= reg_alu_out;
@@ -111,6 +112,7 @@ begin
 			mem_record_wb.alu_out		<= UNDEFINED_32;
 			mem_record_wb.lmd 			<= UNDEFINED_32;
 			mem_record_wb.pc				<= UNDEFINED_32;
+			mem_record_wb.index_dst		<= UNDEFINED_5;
 			
 			mem_record_ex.index_dst		<= UNDEFINED_5;
 			mem_record_ex.dst				<= UNDEFINED_32;

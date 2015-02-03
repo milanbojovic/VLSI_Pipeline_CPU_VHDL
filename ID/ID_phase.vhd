@@ -41,7 +41,7 @@ begin
 	
 	process (record_in_crls.load, record_in_crls.reset) begin 
 		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') then 		
-				reg_pc	<= if_record_id.pc;
+				reg_pc	<= if_record_id.pc1;
 				reg_ir1	<= if_record_id.ir1;
 				reg_ir2	<= if_record_id.ir2;
 				

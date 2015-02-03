@@ -16,7 +16,8 @@ package CPU_PKG is
 	
 	-- Record for one way conection (IF -crls-> ID)
 	type IF_ID_RCD is record
-		pc 	: REG_TYPE;
+		pc1 	: REG_TYPE;
+		pc2 	: REG_TYPE;
 		ir1	: REG_TYPE;
 		ir2	: REG_TYPE;
 	end record;

@@ -23,14 +23,14 @@ use IEEE.STD_LOGIC_ARITH.all;
 
 entity ALU is
 	port(
-			opcode: in OPCODE_TYPE;
-			a : in REG_TYPE;
-			b : in REG_TYPE;
+			opcode		: in OPCODE_TYPE;
+			a 				: in REG_TYPE;
+			b 				: in REG_TYPE;
 
 			negative_in : SIGNAL_BIT_TYPE 	:= '0';
 			carry_in 	: SIGNAL_BIT_TYPE 	:= '0';
 			overflow_in : SIGNAL_BIT_TYPE 	:= '0';
-			zero_in 	 	: SIGNAL_BIT_TYPE 	:= '0';			
+			zero_in 	 	: SIGNAL_BIT_TYPE 	:= '0';
 
 			-- output ports
 			result 		: out REG_TYPE;
@@ -203,7 +203,7 @@ architecture arch of ALU is
 						carry_out, negative_out,
 						zero_out, overflow_out : out  SIGNAL_BIT_TYPE) is
 	begin
-		carry_out			:= carry_in;
+		carry_out		:= carry_in;
 		zero_out			:= zero_in;
 		negative_out	:= negative_in;
 		overflow_out	:= overflow_in;

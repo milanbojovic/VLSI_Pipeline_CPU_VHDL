@@ -173,7 +173,7 @@ begin
 		elsif (rising_edge(record_in_crls.clk) and opcode = OPCODE_STOP) then
 			if(isExecuted = 0) then 				
 				
-				test_mem_procedure;
+				--test_mem_procedure;
 				
 				isExecuted := 1;
 			end if;

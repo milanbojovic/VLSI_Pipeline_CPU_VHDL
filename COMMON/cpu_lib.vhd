@@ -10,7 +10,7 @@ package cpu_lib is
 	constant WORD_WIDTH			: NATURAL 	:= 32;
 	constant REG_WIDTH			: POSITIVE 	:= 32;
 	constant ADDR_WIDTH 			: NATURAL 	:= 32;
-	constant PHASE_DURATION 		: NATURAL 	:= 4;        -- SET PHASE DURATION !!!!!!!!
+	constant PHASE_DURATION 		: NATURAL 	:= 6;        -- SET PHASE DURATION !!!!!!!!
 	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;	 --  should be 2**10-1 or more
 	constant DATA_CACHE_SIZE		: NATURAL 	:= 2**13-1;	 --  should be 2**10-1 or more
 

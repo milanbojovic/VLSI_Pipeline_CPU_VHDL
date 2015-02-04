@@ -25,6 +25,7 @@ package CPU_PKG is
 	
 	-- Record for one way conectio (ID --> EX)
 	type ID_EX_RCD is record
+		--Instruction 1
 		opcode 			: OPCODE_TYPE;
 		pc					: REG_TYPE;
 		a, b				: REG_TYPE;
@@ -34,15 +35,31 @@ package CPU_PKG is
 		index_a			: REG_ADDR_TYPE;
 		index_b			: REG_ADDR_TYPE;
 		index_dst		: REG_ADDR_TYPE;
+		
+		--Instruction 2
+		opcode2			: OPCODE_TYPE;
+		pc2				: REG_TYPE;
+		a2, b2			: REG_TYPE;
+		immediate2		: REG_TYPE;
+		branch_offset2	: REG_TYPE;
+		dst2				: REG_TYPE;
+		index_a2			: REG_ADDR_TYPE;
+		index_b2			: REG_ADDR_TYPE;
+		index_dst2		: REG_ADDR_TYPE;
+		
 	end record;
 	
 	
 	-- Record for one way conection (EX --> IF)
 	type EX_IF_RCD is record
+		--Instruction 1
 		pc				: REG_TYPE;
 		branch_cond	: SIGNAL_BIT_TYPE;
 		flush_out	: SIGNAL_BIT_TYPE;
 		halt_out		: SIGNAL_BIT_TYPE;
+		
+		--Instruction 2
+		pc2			: REG_TYPE;
 	end record;
 	
 	
@@ -54,33 +71,55 @@ package CPU_PKG is
 	
 	-- Record for one way conectio (EX --> MEM)
 	type EX_MEM_RCD is record
+		--Instruction 1
 		opcode		: OPCODE_TYPE;
 		pc 			: REG_TYPE;
 		alu_out		: REG_TYPE;
 		dst			: REG_TYPE;
 		index_dst	: REG_ADDR_TYPE;
+		
+		--Instruction 2
+		opcode2		: OPCODE_TYPE;
+		pc2 			: REG_TYPE;
+		alu_out2		: REG_TYPE;
+		dst2			: REG_TYPE;
+		index_dst2	: REG_ADDR_TYPE;
+		
 	end record;
 	
 	-- Record for one way connection (MEM --> EX)
 	type MEM_EX_RCD is record
 		dst			: REG_TYPE;
 		index_dst 	: REG_ADDR_TYPE;
+		dst2			: REG_TYPE;
+		index_dst2 	: REG_ADDR_TYPE;
 	end record;
 	
 	--Record for one way connection (WB --> EX)
 	type WB_EX_RCD is record
 		dst			: REG_TYPE;
 		index_dst	: REG_ADDR_TYPE;
+		dst2			: REG_TYPE;
+		index_dst2	: REG_ADDR_TYPE;
 	end record;
 	
 	-- Record for one way conection(MEM --> WB)
 	type MEM_WB_RCD is record
+		--Instruction 1
 		opcode 	: OPCODE_TYPE;
 		alu_out	: REG_TYPE;
 		lmd		: REG_TYPE;
 		dst		: REG_TYPE;
 		pc			: REG_TYPE;
 		index_dst: REG_ADDR_TYPE;
+		
+		--Instruction 2
+		opcode2 		: OPCODE_TYPE;
+		alu_out2		: REG_TYPE;
+		lmd2			: REG_TYPE;
+		dst2			: REG_TYPE;
+		pc2			: REG_TYPE;
+		index_dst2	: REG_ADDR_TYPE;
 	end record;
 	
 	-- Record for one way conection(WB --> ID)

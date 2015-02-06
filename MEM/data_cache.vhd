@@ -70,7 +70,7 @@ architecture arch of DATA_CACHE is
 		
 			file_open(content, expected_output_file, read_mode);
 		
-			report 	"                                                                            "&
+			report 	"                                                                  "&
 						"[TEST MEMORY FUNCTION] - Memory test started:";
 			
 			loop
@@ -89,12 +89,12 @@ architecture arch of DATA_CACHE is
 				int_expected_data		:= TO_INTEGER(UNSIGNED(expected_data(expected_data'RANGE))) ; 
 				int_data_cache_data	:= TO_INTEGER(UNSIGNED(data_cache_data(data_cache_data'RANGE))) ; 
 									
-				report "                                                                            "&
+				report "                                                                  "&
 						 "[TEST MEMORY FUNCTION]         memory(" 	& integer'image(int_addr) & ") = " 	 & integer'image(int_data_cache_data) &
 						 "  -->  expected(" & integer'image(int_expected_data) & ")";
 				
 				assert expected_data = data_cache_data
-				report 	"                                                                           "&
+				report 	"                                                                 "&
 							"[TEST MEMORY FUNCTION]         Error at memory(" & integer'image(int_addr) & ")"
 				severity ERROR;
 				

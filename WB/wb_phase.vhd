@@ -89,6 +89,7 @@ begin
 	begin
 		if record_in_crls.reset = '0' then
 			if rising_edge(record_in_crls.clk) then
+			
 				case reg_opcode is
 					-- ALU INSTRUCTION REG/IMM (EXCEPT CMP)
 					when OPCODE_AND | OPCODE_SUB	| OPCODE_ADD | OPCODE_ADC | OPCODE_SBC |
@@ -96,77 +97,48 @@ begin
 						  OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_UMOV| OPCODE_SMOV =>
 						
 						--Instruction 1
-						wb_record_ex.index_dst		<= reg_index_dst;
-						wb_record_ex.dst				<= reg_alu_out;
 						
-						--Instruction 2
-						wb_record_ex.index_dst2		<= reg_index_dst2;
-						wb_record_ex.dst2				<= reg_alu_out2;
+						if(reg_index_dst /= reg_index_dst2) then 
 						
-						if(reg_index_dst = reg_index_dst2) then 
-							wb_record_id.data				<= reg_alu_out2;
-							wb_record_id.reg_adr			<= reg_dst2;
-							wb_record_id.write_enable	<= '1';
-							wb_record_id.write_enable2	<= '0';
-						else
+							wb_record_ex.index_dst		<= reg_index_dst;
+							wb_record_ex.dst				<= reg_alu_out;
+
 							wb_record_id.data				<= reg_alu_out;
 							wb_record_id.reg_adr			<= reg_dst;
-							wb_record_id.data2			<= reg_alu_out2;
-							wb_record_id.reg_adr2		<= reg_dst2;
-							
 							wb_record_id.write_enable	<= '1';
-							wb_record_id.write_enable2	<= '1';
+						else
+							--If both instructions are writing to the same register - just write result of second ins.
+							wb_record_ex.dst				<= UNDEFINED_32;
+							wb_record_ex.index_dst		<= UNDEFINED_5;	
+							wb_record_id.data				<= UNDEFINED_32;
+							wb_record_id.reg_adr			<= UNDEFINED_32;
+							wb_record_id.write_enable	<= '0';
 						end if;
 					when OPCODE_LOAD =>
 						--Instruction 1
-						wb_record_ex.dst				<= reg_lmd;
-						wb_record_ex.index_dst		<= reg_dst(4 downto 0);
-						
-						--Instruction 2
-						wb_record_ex.dst2				<= reg_lmd2;
-						wb_record_ex.index_dst2		<= reg_dst2(4 downto 0);
-						
-						
-						if(reg_index_dst = reg_index_dst2) then 
-							wb_record_id.data				<= reg_lmd2;
-							wb_record_id.reg_adr			<= reg_dst2;
-							wb_record_id.write_enable	<= '1';
-							wb_record_id.write_enable2	<= '0';
-						else
-							wb_record_id.data				<= reg_lmd;
-							wb_record_id.reg_adr			<= reg_dst;
-							wb_record_id.data2			<= reg_lmd2;
-							wb_record_id.reg_adr2		<= reg_dst2;
+						if(reg_index_dst /= reg_index_dst2) then 
+							wb_record_ex.dst				<= reg_lmd;
+							wb_record_ex.index_dst		<= reg_dst(4 downto 0);
 							
+							wb_record_id.data				<= reg_lmd;
+							wb_record_id.reg_adr			<= reg_dst;							
 							wb_record_id.write_enable	<= '1';
-							wb_record_id.write_enable2	<= '1';
+						else 
+							--If both instructions are writing to the same register - just write result of second ins.
+							wb_record_ex.dst				<= UNDEFINED_32;
+							wb_record_ex.index_dst		<= UNDEFINED_5;	
+							wb_record_id.data				<= UNDEFINED_32;
+							wb_record_id.reg_adr			<= UNDEFINED_32;
+							wb_record_id.write_enable	<= '0';						
 						end if;
-						
 					when OPCODE_BLAL =>
 						--Instruction 1
 						wb_record_ex.index_dst 		<= UNDEFINED_5;
 						wb_record_ex.dst				<= UNDEFINED_32;
-						
-						--Instruction 2
-						wb_record_ex.index_dst2 	<= UNDEFINED_5;
-						wb_record_ex.dst2				<= UNDEFINED_32;
-						
-						if(reg_index_dst = reg_index_dst2) then 
-							wb_record_id.data				<= reg_pc2;
-							wb_record_id.reg_adr			<= LINK_ADDR;
-							wb_record_id.write_enable	<= '1';
-							wb_record_id.write_enable2	<= '0';
-						else
-							wb_record_id.data				<= reg_pc;
-							wb_record_id.reg_adr			<= LINK_ADDR;
-							wb_record_id.data2			<= reg_pc2;
-							wb_record_id.reg_adr2		<= LINK_ADDR;
-							
-							wb_record_id.write_enable	<= '1';
-							wb_record_id.write_enable2	<= '1';
-						end if;
 
-
+						wb_record_id.data				<= reg_pc;
+						wb_record_id.reg_adr			<= LINK_ADDR;						
+						wb_record_id.write_enable	<= '1';
 						
 					when others =>
 						-- NOTHING - ALL UNDEFINED
@@ -177,14 +149,53 @@ begin
 						wb_record_ex.dst				<= UNDEFINED_32;
 						wb_record_ex.index_dst		<= UNDEFINED_5;
 						
+				end case;
+				
+				case reg_opcode2 is
+					-- ALU INSTRUCTION REG/IMM (EXCEPT CMP)
+					when OPCODE_AND | OPCODE_SUB	| OPCODE_ADD | OPCODE_ADC | OPCODE_SBC |
+						  OPCODE_SSUB| OPCODE_SADD| OPCODE_SADC| OPCODE_SSBC| OPCODE_MOV |
+						  OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_UMOV| OPCODE_SMOV =>
+						
+						--Instruction 2
+						wb_record_ex.index_dst2		<= reg_index_dst2;
+						wb_record_ex.dst2				<= reg_alu_out2;
+
+						wb_record_id.data2			<= reg_alu_out2;
+						wb_record_id.reg_adr2		<= reg_dst2;
+						wb_record_id.write_enable2	<= '1';
+
+					when OPCODE_LOAD =>
+						
+						--Instruction 2
+						wb_record_ex.dst2				<= reg_lmd2;
+						wb_record_ex.index_dst2		<= reg_dst2(4 downto 0);
+
+						wb_record_id.data2			<= reg_lmd2;
+						wb_record_id.reg_adr2		<= reg_dst2;
+						wb_record_id.write_enable2	<= '1';
+						
+					when OPCODE_BLAL =>
+						
+						--Instruction 2
+						wb_record_ex.index_dst2 	<= UNDEFINED_5;
+						wb_record_ex.dst2				<= UNDEFINED_32;
+						
+						wb_record_id.data2			<= reg_pc2;
+						wb_record_id.reg_adr2		<= LINK_ADDR;
+						wb_record_id.write_enable2	<= '1';
+						
+					when others =>
+						-- NOTHING - ALL UNDEFINED
 						--Instruction 2
 						wb_record_id.data2			<= UNDEFINED_32;
 						wb_record_id.reg_adr2		<= UNDEFINED_32;
-						wb_record_id.write_enable	<= '0';
+						wb_record_id.write_enable2	<= '0';
 						wb_record_ex.dst2				<= UNDEFINED_32;
 						wb_record_ex.index_dst2		<= UNDEFINED_5;
 						
-				end case;
+				end case;			
+				
 			end if;
 		else 
 		-- RESET = 1;
@@ -201,8 +212,8 @@ begin
 		end if;
 	end process;
 	
-	process (record_in_crls.load) begin 
-		if (rising_edge(record_in_crls.load)) then
+	process (record_in_crls.clk) begin 
+		if (rising_edge(record_in_crls.clk)) then
 			if (reg_opcode = OPCODE_STOP OR reg_opcode2 = OPCODE_STOP) then
 				opcode <= OPCODE_STOP;
 			end if;

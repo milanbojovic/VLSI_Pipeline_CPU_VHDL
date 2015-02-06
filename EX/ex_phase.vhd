@@ -286,16 +286,19 @@ begin
 --				reg_index_dst 		<= UNDEFINED_5;
 				
 				--Instruction 2
-				reg_opcode2			<= UNDEFINED_5;
-				reg_pc2				<=	UNDEFINED_32;
-				reg_a2				<=	UNDEFINED_32;
-				reg_b2				<=	UNDEFINED_32;
-				reg_immediate2		<=	UNDEFINED_32;
-				reg_branch_offset2<=	UNDEFINED_32;
-				reg_destionation2	<= UNDEFINED_32;
-				reg_index_a2		<= UNDEFINED_5;
-				reg_index_b2		<= UNDEFINED_5;
-				reg_index_dst2		<= UNDEFINED_5;
+				if (reg_opcode2 /= OPCODE_STOP) then
+				--Stop instruction should continue to next stage
+					reg_opcode2			<= UNDEFINED_5;
+					reg_pc2				<=	UNDEFINED_32;
+					reg_a2				<=	UNDEFINED_32;
+					reg_b2				<=	UNDEFINED_32;
+					reg_immediate2		<=	UNDEFINED_32;
+					reg_branch_offset2<=	UNDEFINED_32;
+					reg_destionation2	<= UNDEFINED_32;
+					reg_index_a2		<= UNDEFINED_5;
+					reg_index_b2		<= UNDEFINED_5;
+					reg_index_dst2		<= UNDEFINED_5;
+				end if;
 			end if;
 		end if;
 	end process;

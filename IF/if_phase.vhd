@@ -47,12 +47,12 @@ begin
 	begin 	
 		if rising_edge(record_in_crls.clk) then
 			if (ex_record_if.flush_out = '1' or ex_record_if.halt_out = '1') then
-				if_record_id.pc1						<= UNDEFINED_32;
+				if_record_id.pc						<= UNDEFINED_32;
 				if_record_id.pc2						<= UNDEFINED_32;
 				if_record_id.ir1						<= UNDEFINED_32;
 				if_record_id.ir2						<= UNDEFINED_32;
 			else 
-				if_record_id.pc1						<= signed(reg_pc1) + 1;
+				if_record_id.pc						<= signed(reg_pc1) + 1;
 				if_record_id.pc2						<= signed(reg_pc1) + 2;
 				if_record_id.ir1						<= reg_ir1;
 				if_record_id.ir2						<= reg_ir2;

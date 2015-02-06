@@ -65,7 +65,7 @@ BEGIN
   report "[TESTBENCH] - Simulation started!";
   
   
-  wait for 400 ns;
+  wait for 2000 ns;
                                              
 END PROCESS always;
 

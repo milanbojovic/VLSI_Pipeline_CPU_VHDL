@@ -16,7 +16,7 @@ package CPU_PKG is
 	
 	-- Record for one way conection (IF -crls-> ID)
 	type IF_ID_RCD is record
-		pc1 	: REG_TYPE;
+		pc 	: REG_TYPE;
 		pc2 	: REG_TYPE;
 		ir1	: REG_TYPE;
 		ir2	: REG_TYPE;
@@ -101,7 +101,7 @@ package CPU_PKG is
 		index_dst	: REG_ADDR_TYPE;
 		dst2			: REG_TYPE;
 		index_dst2	: REG_ADDR_TYPE;
-	end record;
+	end record;	
 	
 	-- Record for one way conection(MEM --> WB)
 	type MEM_WB_RCD is record
@@ -124,9 +124,15 @@ package CPU_PKG is
 	
 	-- Record for one way conection(WB --> ID)
 	type WB_ID_RCD is record
+		--Instruction 1
 		data				: REG_TYPE;
 		reg_adr			: REG_TYPE;
 		write_enable	: SIGNAL_BIT_TYPE;
+		
+		--Instruction 2 
+		data2				: REG_TYPE;
+		reg_adr2			: REG_TYPE;
+		write_enable2	: SIGNAL_BIT_TYPE;
 	end record;	
 	
 	
@@ -142,6 +148,16 @@ package CPU_PKG is
 		pc					: REG_TYPE;
 	end record;	
 	
+	-- Record for one way connection of INSTRUCTION DECODER with REGISTER FILE (DECODER-> REGISTER_FILE) 2
+	type DECODER_REGFILE_RCD_2 is record
+		opcode      	: OPCODE_TYPE;
+		operand_A		: REG_ADDR_TYPE; 				-- Operand_A address in register file 
+		operand_B		: REG_ADDR_TYPE; 				-- Operand_B address in register file 
+		immediate		: IMMEDIATE_TYPE;      		-- Immediate value 
+		destination 	: REG_ADDR_TYPE; 				-- Register index in the register file where the result will be put
+		offset 			: BRANCH_OFFSET_TYPE;		-- Address offset with branch instructions	
+		pc					: REG_TYPE;
+	end record;
 	
 	-- Record for one way connection of If phase with Instruction Cache(INSTR_CACHE -> IF_PHASE)
 	type EX_CONTROL_FLUSH_HALT_OUT is record

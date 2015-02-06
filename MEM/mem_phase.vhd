@@ -122,7 +122,6 @@ begin
 					reg_lmd := UNDEFINED_32;
 			end if;
 			
-						
 			
 			--Instruction 2
 			if (reg_opcode2 = OPCODE_LOAD OR reg_opcode2 = OPCODE_STORE) then

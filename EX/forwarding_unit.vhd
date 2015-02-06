@@ -40,11 +40,13 @@ entity FORWARDING_UNIT is
 		branch_instruction		: out SIGNAL_BIT_TYPE;
 		imm 							: out SIGNAL_BIT_TYPE;
 		out_reg_a, out_reg_b 	: out REG_TYPE;
+		out_index_dst				: out REG_ADDR_TYPE;
 		
 		--Instruction 2
 		branch_instruction2		: out SIGNAL_BIT_TYPE;
 		imm2 							: out SIGNAL_BIT_TYPE;
 		out_reg_a2, out_reg_b2 	: out REG_TYPE;
+		out_index_dst2				: out REG_ADDR_TYPE;
 		
 		--Instruction 1 & 2
 		branch_cond					: out SIGNAL_BIT_TYPE;
@@ -331,16 +333,38 @@ begin
 					
 					out_reg_a2 <= "00000000000000000000000000000000";
 					out_reg_b2 <= "00000000000000000000000000000000";
+					
+					out_index_dst  <= "00000";
+					out_index_dst2 <= "00000";
 				else
-					out_reg_a <= function_forward_data_to_register1(id_index_a, id_reg_a, mem_record_ex, wb_record_ex);
-					out_reg_b <= function_forward_data_to_register1(id_index_b, id_reg_b, mem_record_ex, wb_record_ex);
-			
-					out_reg_a2 <= function_forward_data_to_register2(id_index_a2,  id_reg_a2, mem_record_ex,
-																					 wb_record_ex, id_index_dst, alu_1_out
-																					 );																 
-					out_reg_b2 <= function_forward_data_to_register2(id_index_b2,  id_reg_b2, mem_record_ex, 
-																					 wb_record_ex, id_index_dst, alu_1_out
-																					 );
+					--Instruction 1
+					if (opcode /= OPCODE_LOAD) and (opcode /= OPCODE_STORE) then
+							--For all instructions except LOAD/STORE
+							out_reg_a <= function_forward_data_to_register1(id_index_a, id_reg_a, mem_record_ex, wb_record_ex);
+							out_reg_b <= function_forward_data_to_register1(id_index_b, id_reg_b, mem_record_ex, wb_record_ex);
+							out_index_dst <= id_index_dst;
+					else
+							--For LOAD/STORE instructions
+							out_reg_a <= id_reg_a;
+							out_reg_b <= id_reg_b;
+							out_index_dst <= function_forward_data_to_register1(id_index_dst, ZERO_27 & id_index_dst, mem_record_ex, wb_record_ex)(4  downto 0);
+					end if;
+					--Instruction 2
+					if (opcode2 /= OPCODE_LOAD) and (opcode2 /= OPCODE_STORE) then
+							--For all instructions except LOAD/STORE					
+							out_reg_a2 <= function_forward_data_to_register2(id_index_a2,  id_reg_a2, mem_record_ex,
+																							 wb_record_ex, id_index_dst, alu_1_out
+																							 );																 
+							out_reg_b2 <= function_forward_data_to_register2(id_index_b2,  id_reg_b2, mem_record_ex, 
+																							 wb_record_ex, id_index_dst, alu_1_out
+																							 );
+							out_index_dst2 <= id_index_dst2;
+					else
+							--For LOAD/STORE instructions
+							out_reg_a2 <= id_reg_a2;
+							out_reg_b2 <= id_reg_b2;
+							out_index_dst2 <= function_forward_data_to_register1(id_index_dst2, ZERO_27 & id_index_dst2, mem_record_ex, wb_record_ex)(4  downto 0);
+					end if;
 				end if;
 			end if;
 	end process;

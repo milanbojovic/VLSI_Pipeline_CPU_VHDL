@@ -106,31 +106,68 @@ architecture arch of DATA_CACHE is
 			file_close(content);
 			
 			if test_result = 1 then 
-					--report 	"                                                                            "&
-					--			"[TEST MEMORY FUNCTION] - Test status: SUCCESS ";
-report 
-"(@@) (  ) (@)  ( )  @@    ()    @     O     @"& LF &
-"                     (   )"& LF &
-"                 (@@@@)"& LF &
-"              (    )"& LF &
-""& LF &
-"            (@@@)"& LF &
-"         ====        ________                ___________"& LF &
-"     _D _|  |_______/        \__I_I_____===__|_________|"& LF &
-"      |(_)---  |   H\________/ |   |        =|___ ___|      ________________"& LF &
-"      /     |  |   H  |  |     |   |         ||_| |_||     _|"& LF &
-"     |      |  |   H  |__--------------------| [___] |   =|"& LF &
-"     | ________|___H__/__|_____/[][]~\_______|       |   -|"& LF &
-"     |/ |   |-----------I_____I [][] []  D   |=======|____|_________________"& LF &
-"   __/ =| o |=-O=====O=====O=====O \ ____Y___________|__|___________________"& LF &
-"    |/-=|___|=    ||    ||    ||    |_____/~\___/          |_D__D__D_|  |_D_"& LF &
-"     \_/      \__/  \__/  \__/  \__/      \_/               \_/   \_/    \_/"& LF &
-"";
+			report 
+				--"                                                             "&
+				-- "[TEST MEMORY FUNCTION] - Test Success !!!";
+--						"" & LF &
+--						"  _______        _      _____                             "& LF &
+--						" |__   __|      | |    / ____|                            "& LF &
+--						"    | | ___  ___| |_  | (___  _   _  ___ ___ ___  ___ ___ "& LF &
+--						"    | |/ _ \/ __| __|  \___ \| | | |/ __/ __/ _ \/ __/ __|"& LF &
+--						"    | |  __/\__ \ |_   ____) | |_| | (_| (_|  __/\__ \__ \ "& LF &
+--						"    |_|\___||___/\__| |_____/ \__,_|\___\___\___||___/___/ ";
+--                                                          
+						"" & LF &				
+						" TTTTTTTTTTTTTTTTTTTTTTT                                       tttt                  SSSSSSSSSSSSSSSUUUUUUUU     UUUUUUUU      CCCCCCCCCCCCC      CCCCCCCCCCCCEEEEEEEEEEEEEEEEEEEEEE  SSSSSSSSSSSSSSS   SSSSSSSSSSSSSSSFFFFFFFFFFFFFFFFFFFFFUUUUUUUU     UUUUUUULLLLLLLLLLL             "& LF &  
+						" T:::::::::::::::::::::T                                    ttt:::t                SS:::::::::::::::U::::::U     U::::::U   CCC::::::::::::C   CCC::::::::::::E::::::::::::::::::::ESS:::::::::::::::SSS:::::::::::::::F::::::::::::::::::::U::::::U     U::::::L:::::::::L             "& LF &
+						" T:::::::::::::::::::::T                                    t:::::t               S:::::SSSSSS::::::U::::::U     U::::::U CC:::::::::::::::C CC:::::::::::::::E::::::::::::::::::::S:::::SSSSSS::::::S:::::SSSSSS::::::F::::::::::::::::::::U::::::U     U::::::L:::::::::L             "& LF &
+						" T:::::TT:::::::TT:::::T                                    t:::::t               S:::::S     SSSSSSUU:::::U     U:::::UUC:::::CCCCCCCC::::CC:::::CCCCCCCC::::EE::::::EEEEEEEEE::::S:::::S     SSSSSSS:::::S     SSSSSSFF::::::FFFFFFFFF::::UU:::::U     U:::::ULL:::::::LL             "& LF &
+						" TTTTTT  T:::::T  TTTTTeeeeeeeeeeee       ssssssssss  ttttttt:::::ttttttt         S:::::S            U:::::U     U:::::UC:::::C       CCCCCC:::::C       CCCCCC E:::::E       EEEEES:::::S           S:::::S             F:::::F       FFFFFFU:::::U     U:::::U  L:::::L               "& LF &
+						"        T:::::T     ee::::::::::::ee   ss::::::::::s t:::::::::::::::::t         S:::::S            U:::::D     D:::::C:::::C            C:::::C               E:::::E            S:::::S           S:::::S             F:::::F             U:::::D     D:::::U  L:::::L                "& LF &
+						"        T:::::T    e::::::eeeee:::::ess:::::::::::::st:::::::::::::::::t          S::::SSSS         U:::::D     D:::::C:::::C            C:::::C               E::::::EEEEEEEEEE   S::::SSSS         S::::SSSS          F::::::FFFFFFFFFF   U:::::D     D:::::U  L:::::L                "& LF &
+						"        T:::::T   e::::::e     e:::::s::::::ssss:::::tttttt:::::::tttttt           SS::::::SSSSS    U:::::D     D:::::C:::::C            C:::::C               E:::::::::::::::E    SS::::::SSSSS     SS::::::SSSSS     F:::::::::::::::F   U:::::D     D:::::U  L:::::L                "& LF &
+						"        T:::::T   e:::::::eeeee::::::es:::::s  ssssss      t:::::t                   SSS::::::::SS  U:::::D     D:::::C:::::C            C:::::C               E:::::::::::::::E      SSS::::::::SS     SSS::::::::SS   F:::::::::::::::F   U:::::D     D:::::U  L:::::L                "& LF &
+						"        T:::::T   e:::::::::::::::::e   s::::::s           t:::::t                      SSSSSS::::S U:::::D     D:::::C:::::C            C:::::C               E::::::EEEEEEEEEE         SSSSSS::::S       SSSSSS::::S  F::::::FFFFFFFFFF   U:::::D     D:::::U  L:::::L                "& LF &
+						"        T:::::T   e::::::eeeeeeeeeee       s::::::s        t:::::t                           S:::::SU:::::D     D:::::C:::::C            C:::::C               E:::::E                        S:::::S           S:::::S F:::::F             U:::::D     D:::::U  L:::::L                "& LF &
+						"        T:::::T   e:::::::e          ssssss   s:::::s      t:::::t    tttttt                 S:::::SU::::::U   U::::::UC:::::C       CCCCCC:::::C       CCCCCC E:::::E       EEEEEE           S:::::S           S:::::S F:::::F             U::::::U   U::::::U  L:::::L         LLLLLL "& LF &
+						"      TT:::::::TT e::::::::e         s:::::ssss::::::s     t::::::tttt:::::t     SSSSSSS     S:::::SU:::::::UUU:::::::U C:::::CCCCCCCC::::CC:::::CCCCCCCC::::EE::::::EEEEEEEE:::::SSSSSSS     S:::::SSSSSSS     S:::::FF:::::::FF           U:::::::UUU:::::::ULL:::::::LLLLLLLLL:::::L "& LF &
+						"      T:::::::::T  e::::::::eeeeeeee s::::::::::::::s      tt::::::::::::::t     S::::::SSSSSS:::::S UU:::::::::::::UU   CC:::::::::::::::C CC:::::::::::::::E::::::::::::::::::::S::::::SSSSSS:::::S::::::SSSSSS:::::F::::::::FF            UU:::::::::::::UU L::::::::::::::::::::::L "& LF &
+						"      T:::::::::T   ee:::::::::::::e  s:::::::::::ss         tt:::::::::::tt     S:::::::::::::::SS    UU:::::::::UU       CCC::::::::::::C   CCC::::::::::::E::::::::::::::::::::S:::::::::::::::SSS:::::::::::::::SSF::::::::FF              UU:::::::::UU   L::::::::::::::::::::::L "& LF &
+						"      TTTTTTTTTTT     eeeeeeeeeeeeee   sssssssssss             ttttttttttt        SSSSSSSSSSSSSSS        UUUUUUUUU            CCCCCCCCCCCCC      CCCCCCCCCCCCEEEEEEEEEEEEEEEEEEEEEESSSSSSSSSSSSSSS   SSSSSSSSSSSSSSS  FFFFFFFFFFF                UUUUUUUUU     LLLLLLLLLLLLLLLLLLLLLLLL ";
 
-			else 
-					report 	"                                                                            "&					
-								"[TEST MEMORY FUNCTION] - Test status:  FAIL";
+			elsif test_result = 0 then
+					report --"                                                             "&
+							 --"[TEST MEMORY FUNCTION] - Test Failed !!!";
+--							"" & LF &
+--							"  _______        _     ______    _ _          _  "& LF &
+--							" |__   __|      | |   |  ____|  (_) |        | | "& LF &
+--							"    | | ___  ___| |_  | |__ __ _ _| | ___  __| | "& LF &
+--							"    | |/ _ \/ __| __| |  __/ _` | | |/ _ \/ _` | "& LF &
+--							"    | |  __/\__ \ |_  | | | (_| | | |  __/ (_| | "& LF &
+--							"    |_|\___||___/\__| |_|  \__,_|_|_|\___|\__,_| ";
+                                                 
+                                                 
+
+							 
+							"" & LF &					
+							" TTTTTTTTTTTTTTTTTTTTTTT                                          tttt               FFFFFFFFFFFFFFFFFFFFFF      AAA               IIIIIIIIIILLLLLLLLLLL             EEEEEEEEEEEEEEEEEEEEEEDDDDDDDDDDDDD        "& LF &
+							" T:::::::::::::::::::::T                                       ttt:::t               F::::::::::::::::::::F     A:::A              I::::::::IL:::::::::L             E::::::::::::::::::::ED::::::::::::DDD     "& LF &
+							" T:::::::::::::::::::::T                                       t:::::t               F::::::::::::::::::::F    A:::::A             I::::::::IL:::::::::L             E::::::::::::::::::::ED:::::::::::::::DD   "& LF &
+							" T:::::TT:::::::TT:::::T                                       t:::::t               FF::::::FFFFFFFFF::::F   A:::::::A            II::::::IILL:::::::LL             EE::::::EEEEEEEEE::::EDDD:::::DDDDD:::::D  "& LF &
+							" TTTTTT  T:::::T  TTTTTTeeeeeeeeeeee        ssssssssss   ttttttt:::::ttttttt           F:::::F       FFFFFF  A:::::::::A             I::::I    L:::::L                 E:::::E       EEEEEE  D:::::D    D:::::D "& LF &
+							"        T:::::T      ee::::::::::::ee    ss::::::::::s  t:::::::::::::::::t           F:::::F              A:::::A:::::A            I::::I    L:::::L                 E:::::E               D:::::D     D:::::D "& LF &
+							"        T:::::T     e::::::eeeee:::::eess:::::::::::::s t:::::::::::::::::t           F::::::FFFFFFFFFF   A:::::A A:::::A           I::::I    L:::::L                 E::::::EEEEEEEEEE     D:::::D     D:::::D "& LF &
+							"        T:::::T    e::::::e     e:::::es::::::ssss:::::stttttt:::::::tttttt           F:::::::::::::::F  A:::::A   A:::::A          I::::I    L:::::L                 E:::::::::::::::E     D:::::D     D:::::D "& LF &
+							"        T:::::T    e:::::::eeeee::::::e s:::::s  ssssss       t:::::t                 F:::::::::::::::F A:::::A     A:::::A         I::::I    L:::::L                 E:::::::::::::::E     D:::::D     D:::::D "& LF &
+							"        T:::::T    e:::::::::::::::::e    s::::::s            t:::::t                 F::::::FFFFFFFFFFA:::::AAAAAAAAA:::::A        I::::I    L:::::L                 E::::::EEEEEEEEEE     D:::::D     D:::::D "& LF &
+							"        T:::::T    e::::::eeeeeeeeeee        s::::::s         t:::::t                 F:::::F         A:::::::::::::::::::::A       I::::I    L:::::L                 E:::::E               D:::::D     D:::::D "& LF &
+							"        T:::::T    e:::::::e           ssssss   s:::::s       t:::::t    tttttt       F:::::F        A:::::AAAAAAAAAAAAA:::::A      I::::I    L:::::L         LLLLLL  E:::::E       EEEEEE  D:::::D    D:::::D  "& LF &
+							"      TT:::::::TT  e::::::::e          s:::::ssss::::::s      t::::::tttt:::::t     FF:::::::FF     A:::::A             A:::::A   II::::::IILL:::::::LLLLLLLLL:::::LEE::::::EEEEEEEE:::::EDDD:::::DDDDD:::::D   "& LF &
+							"      T:::::::::T   e::::::::eeeeeeee  s::::::::::::::s       tt::::::::::::::t     F::::::::FF    A:::::A               A:::::A  I::::::::IL::::::::::::::::::::::LE::::::::::::::::::::ED:::::::::::::::DD    "& LF &
+							"      T:::::::::T    ee:::::::::::::e   s:::::::::::ss          tt:::::::::::tt     F::::::::FF   A:::::A                 A:::::A I::::::::IL::::::::::::::::::::::LE::::::::::::::::::::ED::::::::::::DDD      "& LF &
+							"      TTTTTTTTTTT      eeeeeeeeeeeeee    sssssssssss              ttttttttttt       FFFFFFFFFFF  AAAAAAA                   AAAAAAAIIIIIIIIIILLLLLLLLLLLLLLLLLLLLLLLLEEEEEEEEEEEEEEEEEEEEEEDDDDDDDDDDDDD         ";
 			end if;
+
 
 			report 	"                                                                            "&
 						"[TEST MEMORY FUNCTION] - Memory test FINISHED";
@@ -173,7 +210,7 @@ begin
 		elsif (rising_edge(record_in_crls.clk) and opcode = OPCODE_STOP) then
 			if(isExecuted = 0) then 				
 				
-				--test_mem_procedure;
+				test_mem_procedure;
 				
 				isExecuted := 1;
 			end if;

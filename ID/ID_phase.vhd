@@ -33,19 +33,22 @@ end ID_PHASE;
 architecture arch of ID_PHASE is
 
 	--Register PC (Program Counter)
-	signal reg_pc						: REG_TYPE;
-	signal reg_ir1, reg_ir2			: REG_TYPE;
-	signal decoder_record_regfile : DECODER_REGFILE_RCD;
+	signal reg_pc, reg_pc2						 : REG_TYPE;
+	signal reg_ir1, reg_ir2			 : REG_TYPE;
+	signal decoder_record_regfile  : DECODER_REGFILE_RCD;
+	signal decoder_record_regfile2 : DECODER_REGFILE_RCD_2;
 		
 begin
 	
 	process (record_in_crls.load, record_in_crls.reset) begin 
 		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') then 		
-				reg_pc	<= if_record_id.pc1;
+				reg_pc	<= if_record_id.pc;
+				reg_pc2  <= if_record_id.pc2;
 				reg_ir1	<= if_record_id.ir1;
 				reg_ir2	<= if_record_id.ir2;
 				
 		elsif (record_in_crls.reset = '1') then
+				reg_pc2  <= UNDEFINED_32;
 				reg_pc	<= UNDEFINED_32;
 				reg_ir1	<= UNDEFINED_32;
 				reg_ir2	<= UNDEFINED_32;		
@@ -60,11 +63,20 @@ begin
 					 decoder_record_regfile => decoder_record_regfile
 					);				 
 					 
+	--Instatination and connecting of INSTRUCTION_DECODER_1
+	COMP_instr_dec_2 : entity work.INSTRUCTION_DECODER_2(arch)
+		port map (
+					instruction 				=> reg_ir2,
+					pc								=> reg_pc2,
+					decoder_record_regfile2  => decoder_record_regfile2
+					);
+	
 	--Instatination and connecting of REG_FILE
 	COMP_reg_file : entity work.REG_FILE(arch)
 		port map (
 						record_in_crls				=>	record_in_crls,
 						decoder_record_regfile	=> decoder_record_regfile, 
+						decoder_record_regfile2 => decoder_record_regfile2,
 						wb_record_id				=> wb_record_id,
 						ex_record_id				=> ex_record_id,
 						id_record_ex				=> id_record_ex

@@ -17,6 +17,7 @@ entity WB_PHASE is
 		mem_record_wb			: in MEM_WB_RCD;
 		
 		-- ID Phase
+		opcode					: out OPCODE_TYPE;
 		wb_record_id			: out WB_ID_RCD;
 		wb_record_ex			: out WB_EX_RCD
 		
@@ -95,48 +96,77 @@ begin
 						  OPCODE_NOT | OPCODE_SL  | OPCODE_SR  | OPCODE_ASR | OPCODE_UMOV| OPCODE_SMOV =>
 						
 						--Instruction 1
-						wb_record_id.data				<= reg_alu_out;
-						wb_record_id.reg_adr			<= reg_dst;
-						wb_record_id.write_enable	<= '1';
 						wb_record_ex.index_dst		<= reg_index_dst;
 						wb_record_ex.dst				<= reg_alu_out;
 						
 						--Instruction 2
-						wb_record_id.data				<= reg_alu_out2;
-						wb_record_id.reg_adr			<= reg_dst2;
-						wb_record_id.write_enable	<= '1';
 						wb_record_ex.index_dst2		<= reg_index_dst2;
 						wb_record_ex.dst2				<= reg_alu_out2;
 						
+						if(reg_index_dst = reg_index_dst2) then 
+							wb_record_id.data				<= reg_alu_out2;
+							wb_record_id.reg_adr			<= reg_dst2;
+							wb_record_id.write_enable	<= '1';
+							wb_record_id.write_enable2	<= '0';
+						else
+							wb_record_id.data				<= reg_alu_out;
+							wb_record_id.reg_adr			<= reg_dst;
+							wb_record_id.data2			<= reg_alu_out2;
+							wb_record_id.reg_adr2		<= reg_dst2;
+							
+							wb_record_id.write_enable	<= '1';
+							wb_record_id.write_enable2	<= '1';
+						end if;
 					when OPCODE_LOAD =>
 						--Instruction 1
-						wb_record_id.data				<= reg_lmd;
-						wb_record_id.reg_adr			<= reg_dst;
-						wb_record_id.write_enable	<= '1';
 						wb_record_ex.dst				<= reg_lmd;
 						wb_record_ex.index_dst		<= reg_dst(4 downto 0);
 						
 						--Instruction 2
-						wb_record_id.data				<= reg_lmd2;
-						wb_record_id.reg_adr			<= reg_dst2;
-						wb_record_id.write_enable	<= '1';
 						wb_record_ex.dst2				<= reg_lmd2;
 						wb_record_ex.index_dst2		<= reg_dst2(4 downto 0);
 						
+						
+						if(reg_index_dst = reg_index_dst2) then 
+							wb_record_id.data				<= reg_lmd2;
+							wb_record_id.reg_adr			<= reg_dst2;
+							wb_record_id.write_enable	<= '1';
+							wb_record_id.write_enable2	<= '0';
+						else
+							wb_record_id.data				<= reg_lmd;
+							wb_record_id.reg_adr			<= reg_dst;
+							wb_record_id.data2			<= reg_lmd2;
+							wb_record_id.reg_adr2		<= reg_dst2;
+							
+							wb_record_id.write_enable	<= '1';
+							wb_record_id.write_enable2	<= '1';
+						end if;
+						
 					when OPCODE_BLAL =>
 						--Instruction 1
-						wb_record_id.data				<= reg_pc;
-						wb_record_id.reg_adr			<= LINK_ADDR;   -- Reg 31 (link reg)
-						wb_record_id.write_enable	<= '1';
 						wb_record_ex.index_dst 		<= UNDEFINED_5;
 						wb_record_ex.dst				<= UNDEFINED_32;
 						
 						--Instruction 2
-						wb_record_id.data				<= reg_pc2;
-						wb_record_id.reg_adr			<= LINK_ADDR;   -- Reg 31 (link reg)
-						wb_record_id.write_enable	<= '1';
 						wb_record_ex.index_dst2 	<= UNDEFINED_5;
 						wb_record_ex.dst2				<= UNDEFINED_32;
+						
+						if(reg_index_dst = reg_index_dst2) then 
+							wb_record_id.data				<= reg_pc2;
+							wb_record_id.reg_adr			<= LINK_ADDR;
+							wb_record_id.write_enable	<= '1';
+							wb_record_id.write_enable2	<= '0';
+						else
+							wb_record_id.data				<= reg_pc;
+							wb_record_id.reg_adr			<= LINK_ADDR;
+							wb_record_id.data2			<= reg_pc2;
+							wb_record_id.reg_adr2		<= LINK_ADDR;
+							
+							wb_record_id.write_enable	<= '1';
+							wb_record_id.write_enable2	<= '1';
+						end if;
+
+
 						
 					when others =>
 						-- NOTHING - ALL UNDEFINED
@@ -148,8 +178,8 @@ begin
 						wb_record_ex.index_dst		<= UNDEFINED_5;
 						
 						--Instruction 2
-						wb_record_id.data				<= UNDEFINED_32;
-						wb_record_id.reg_adr			<= UNDEFINED_32;
+						wb_record_id.data2			<= UNDEFINED_32;
+						wb_record_id.reg_adr2		<= UNDEFINED_32;
 						wb_record_id.write_enable	<= '0';
 						wb_record_ex.dst2				<= UNDEFINED_32;
 						wb_record_ex.index_dst2		<= UNDEFINED_5;
@@ -171,4 +201,15 @@ begin
 		end if;
 	end process;
 	
+	process (record_in_crls.load) begin 
+		if (rising_edge(record_in_crls.load)) then
+			if (reg_opcode = OPCODE_STOP OR reg_opcode2 = OPCODE_STOP) then
+				opcode <= OPCODE_STOP;
+			end if;
+		end if;
+	end process;	
+	
 end arch;
+
+
+

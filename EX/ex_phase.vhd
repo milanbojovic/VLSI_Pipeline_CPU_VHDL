@@ -137,6 +137,9 @@ architecture arch of EX_PHASE is
 	signal sig_alu_out				: REG_TYPE := ZERO_32;
 	--Instruction 2
 	signal sig_alu_out2				: REG_TYPE := ZERO_32;
+	
+	signal sig_index_dst 			: OPCODE_TYPE;
+	signal sig_index_dst2 			: OPCODE_TYPE;
 begin
 
 		--Instruction 1
@@ -177,11 +180,10 @@ begin
 																									sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
 																									sig_opcode2,
 																									reg_index_a2, reg_index_b2, reg_index_dst2, reg_a2, reg_b2,
-																									sig_branch_instruction,  sig_Imm,	sig_regA_to_muxA,   sig_regB_to_muxB0,
-																									sig_branch_instruction2, sig_Imm2,	sig_regA2_to_muxA2, sig_regB2_to_muxB20,
+																									sig_branch_instruction,  sig_Imm,	sig_regA_to_muxA,   sig_regB_to_muxB0, sig_index_dst,
+																									sig_branch_instruction2, sig_Imm2,	sig_regA2_to_muxA2, sig_regB2_to_muxB20, sig_index_dst2,
 																									sig_cond, sig_ex_pc_if, sig_record_control_out
-																								 );
-
+																								 );		
 		--Instruction 1
 		sig_opcode 						<= reg_opcode;
 		sig_regPc_to_muxA 			<= reg_pc;
@@ -190,7 +192,7 @@ begin
 		
 		ex_record_mem.alu_out 		<= sig_alu_out;
 		ex_record_mem.opcode  		<= sig_opcode;
-		ex_record_mem.dst				<= reg_destionation;
+		ex_record_mem.dst				<= ZERO_27 & sig_index_dst;
 		ex_record_mem.pc				<= reg_pc;
 		ex_record_mem.index_dst		<= reg_index_dst;
 		
@@ -202,7 +204,7 @@ begin
 		
 		ex_record_mem.alu_out2 		<= sig_alu_out2;
 		ex_record_mem.opcode2 		<= sig_opcode2;
-		ex_record_mem.dst2			<= reg_destionation2;
+		ex_record_mem.dst2			<= ZERO_27 & sig_index_dst2;
 		ex_record_mem.pc2				<= reg_pc2;
 		ex_record_mem.index_dst2	<= reg_index_dst2;
 
@@ -269,7 +271,21 @@ begin
 		elsif (sig_record_control_out.flush_out = '1') then 
 			--Logic to flush only one instruction from EX phase which need's to be flushed !!!
 			if (sig_ex_pc_if = sig_alu_out) then
-				-- If 1st instruction jumps ==> flush instruction2
+				-- If 1st instruction jumps ==> flush instruction2!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+				
+				--Instruction 1
+--				reg_opcode 			<= UNDEFINED_5;
+--				reg_pc 				<=	UNDEFINED_32;
+--				reg_a 				<=	UNDEFINED_32;
+--				reg_b 				<=	UNDEFINED_32;
+--				reg_immediate 		<=	UNDEFINED_32;
+--				reg_branch_offset <=	UNDEFINED_32;
+--				reg_destionation 	<= UNDEFINED_32;
+--				reg_index_a 		<= UNDEFINED_5;
+--				reg_index_b 		<= UNDEFINED_5;
+--				reg_index_dst 		<= UNDEFINED_5;
+				
+				--Instruction 2
 				reg_opcode2			<= UNDEFINED_5;
 				reg_pc2				<=	UNDEFINED_32;
 				reg_a2				<=	UNDEFINED_32;

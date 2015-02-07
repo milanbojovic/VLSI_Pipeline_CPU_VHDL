@@ -102,7 +102,7 @@ package CPU_PKG is
 		dst2			: REG_TYPE;
 		index_dst2	: REG_ADDR_TYPE;
 	end record;	
-	
+
 	-- Record for one way conection(MEM --> WB)
 	type MEM_WB_RCD is record
 		--Instruction 1

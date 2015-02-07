@@ -20,7 +20,6 @@ entity WB_PHASE is
 		opcode					: out OPCODE_TYPE;
 		wb_record_id			: out WB_ID_RCD;
 		wb_record_ex			: out WB_EX_RCD
-		
 	);
 end WB_PHASE;
 

@@ -26,7 +26,6 @@ entity REG_FILE is
 		
 		-- Output ports
 		id_record_ex				: out ID_EX_RCD
-		
 	);
 	
 end REG_FILE;

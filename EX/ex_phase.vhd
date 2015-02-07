@@ -138,8 +138,8 @@ architecture arch of EX_PHASE is
 	--Instruction 2
 	signal sig_alu_out2				: REG_TYPE := ZERO_32;
 	
-	signal sig_index_dst 			: OPCODE_TYPE;
-	signal sig_index_dst2 			: OPCODE_TYPE;
+	signal sig_index_dst 			: REG_TYPE;
+	signal sig_index_dst2 			: REG_TYPE;
 begin
 
 		--Instruction 1
@@ -178,8 +178,10 @@ begin
 																									sig_opcode,
 																									reg_index_a, reg_index_b, reg_index_dst, reg_a, reg_b,	
 																									sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
+																									reg_destionation,
 																									sig_opcode2,
 																									reg_index_a2, reg_index_b2, reg_index_dst2, reg_a2, reg_b2,
+																									reg_destionation2,
 																									sig_branch_instruction,  sig_Imm,	sig_regA_to_muxA,   sig_regB_to_muxB0, sig_index_dst,
 																									sig_branch_instruction2, sig_Imm2,	sig_regA2_to_muxA2, sig_regB2_to_muxB20, sig_index_dst2,
 																									sig_cond, sig_ex_pc_if, sig_record_control_out
@@ -192,7 +194,7 @@ begin
 		
 		ex_record_mem.alu_out 		<= sig_alu_out;
 		ex_record_mem.opcode  		<= sig_opcode;
-		ex_record_mem.dst				<= ZERO_27 & sig_index_dst;
+		ex_record_mem.dst				<= sig_index_dst;
 		ex_record_mem.pc				<= reg_pc;
 		ex_record_mem.index_dst		<= reg_index_dst;
 		
@@ -204,7 +206,7 @@ begin
 		
 		ex_record_mem.alu_out2 		<= sig_alu_out2;
 		ex_record_mem.opcode2 		<= sig_opcode2;
-		ex_record_mem.dst2			<= ZERO_27 & sig_index_dst2;
+		ex_record_mem.dst2			<= sig_index_dst2;
 		ex_record_mem.pc2				<= reg_pc2;
 		ex_record_mem.index_dst2	<= reg_index_dst2;
 
@@ -212,6 +214,8 @@ begin
 		ex_record_if.branch_cond 	<= sig_cond;
 		ex_record_if.flush_out		<= sig_record_control_out.flush_out;
 		ex_record_if.halt_out		<= sig_record_control_out.halt_out;
+		ex_record_if.pc				<= sig_ex_pc_if;
+		
 		ex_record_id.flush_out		<= sig_record_control_out.flush_out;
 		
 		

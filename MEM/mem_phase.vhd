@@ -15,7 +15,9 @@ entity MEM_PHASE is
 
 		-- EX_Phase
 		ex_record_mem			: in EX_MEM_RCD;
-
+		
+		-- WB --> MEM
+		wb_record_mem			: in WB_EX_RCD;
 		-- WB Phase
 		mem_record_wb			: out MEM_WB_RCD;
 		
@@ -105,7 +107,19 @@ begin
 						else
 							--Store Instruction
 							mem_record_data_cache.control <= "0001";
-							mem_record_data_cache.dataIn  <= reg_dest;
+							
+							if (reg_index_dst = wb_record_mem.index_dst2) then
+									mem_record_data_cache.dataIn  <= wb_record_mem.dst2;
+									
+							elsif (reg_index_dst = wb_record_mem.index_dst) then 
+							
+									mem_record_data_cache.dataIn  <= wb_record_mem.dst;
+									
+							else
+							
+									mem_record_data_cache.dataIn  <= reg_dest;
+									
+							end if;						
 						end if;
 					when 2 =>
 						if (reg_opcode = OPCODE_LOAD) then
@@ -133,9 +147,22 @@ begin
 					  --Load Instruction
 					  mem_record_data_cache.control <= "0010";
 					else
-					  --Store Instruction
-					  mem_record_data_cache.control <= "0001";
-					  mem_record_data_cache.dataIn  <= reg_dest2;
+						--Store Instruction
+						mem_record_data_cache.control <= "0001";
+			
+						if (reg_index_dst2 = wb_record_mem.index_dst2) then 
+							
+								mem_record_data_cache.dataIn  <= wb_record_mem.dst2;
+								
+						elsif (reg_index_dst2 = wb_record_mem.index_dst) then 
+						
+								mem_record_data_cache.dataIn  <= wb_record_mem.dst;
+								
+						else
+						
+								mem_record_data_cache.dataIn  <= reg_dest2;
+								
+						end if;					  
 					end if;
 				 when 5 =>
 					if (reg_opcode2 = OPCODE_LOAD) then

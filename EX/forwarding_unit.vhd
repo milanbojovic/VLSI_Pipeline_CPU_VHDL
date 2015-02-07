@@ -25,6 +25,7 @@ entity FORWARDING_UNIT is
 		id_reg_a						: in REG_TYPE;
 		id_reg_b						: in REG_TYPE;
 		N, C, V, Z					: in std_logic;
+		id_reg_dst					: in REG_TYPE;   
 		
 		--Instruction 2
 		opcode2 						: in OPCODE_TYPE;
@@ -33,6 +34,8 @@ entity FORWARDING_UNIT is
 		id_index_dst2				: in REG_ADDR_TYPE;
 		id_reg_a2					: in REG_TYPE;
 		id_reg_b2					: in REG_TYPE;
+		id_reg_dst2					: in REG_TYPE; 
+		
 		
 		
 		-- Output ports			
@@ -40,19 +43,18 @@ entity FORWARDING_UNIT is
 		branch_instruction		: out SIGNAL_BIT_TYPE;
 		imm 							: out SIGNAL_BIT_TYPE;
 		out_reg_a, out_reg_b 	: out REG_TYPE;
-		out_index_dst				: out REG_ADDR_TYPE;
+		out_index_dst				: out REG_TYPE;
 		
 		--Instruction 2
 		branch_instruction2		: out SIGNAL_BIT_TYPE;
 		imm2 							: out SIGNAL_BIT_TYPE;
 		out_reg_a2, out_reg_b2 	: out REG_TYPE;
-		out_index_dst2				: out REG_ADDR_TYPE;
+		out_index_dst2				: out REG_TYPE;
 		
 		--Instruction 1 & 2
 		branch_cond					: out SIGNAL_BIT_TYPE;
 		ex_pc_if						: out REG_TYPE;
 		sig_record_control_out	: out EX_CONTROL_FLUSH_HALT_OUT
-		
     ); 
 	 
 	 function function_forward_data_to_register1(source_index: REG_ADDR_TYPE; source_value: REG_TYPE;
@@ -122,8 +124,9 @@ architecture arch of FORWARDING_UNIT is
 	 
 	 
 	
-	shared variable flush_out1, flush_out2, halt_out1, halt_out2, branch_cond1, branch_cond2	: SIGNAL_BIT_TYPE := '0';	
-	
+	shared variable flush_out1, flush_out2, halt_out1, halt_out2,
+						 branch_cond1, branch_cond2, bc_var, flout_var : SIGNAL_BIT_TYPE := '0';	
+
 begin	
 
 	set_branch_instruction1:
@@ -235,7 +238,6 @@ begin
 	end process;
 	
 	
-	
 	set_control_signals2:
 	process(opcode2, N, C, V, Z, record_in_crls.clk, record_in_crls.reset) is		
 	begin
@@ -301,22 +303,60 @@ begin
 			end if;
 	end process;
 	
+	
+--	
+--	branch_flush_process:
+--	process(record_in_crls.load) is		
+--	begin
+--			if rising_edge(record_in_crls.load) then
+--					sig_record_control_out.flush_out <= '0';
+--					branch_cond 						  <= '0';
+--			end if;
+--
+--	end process;
+--	
+	
+--		branch_flush_process12:
+--	process(record_in_crls.clk) is		
+--	begin
+--		if rising_edge(record_in_crls.clk and  <= flush_outLoad = 0) then
+--			flush_outLoad := flush_global;
+--			branch_cond_load := bc_var;
+--		end if;
+--	end process;
+	
 	BRANCH_COND_PROCESS: --which sets branch condition and PC
 	process (record_in_crls.clk) 
-	variable bc_var :	SIGNAL_BIT_TYPE;
+	variable count : integer := 0;
+	variable cond : SIGNAL_BIT_TYPE := '1';
 	begin
-		sig_record_control_out.halt_out 	<= halt_out1		or 	halt_out2;
-		sig_record_control_out.flush_out <= flush_out1		or 	flush_out2;
-		bc_var		 							:= branch_cond1	or 	branch_cond2;
-		branch_cond 							<= bc_var;
-		
-		if(bc_var = '0') then
-			ex_pc_if 		<= UNDEFINED_32;
-		else
-			if (branch_cond1 = '1') then
-				ex_pc_if 	<= alu_1_out;
+		if(rising_edge(record_in_crls.clk)) then
+			sig_record_control_out.halt_out 	<= halt_out1		or 	halt_out2;
+			sig_record_control_out.flush_out	<= (flush_out1		and cond)	or 	(flush_out2 and cond);
+			flout_var								:= (flush_out1		and cond)	or 	(flush_out2 and cond);
+			branch_cond								<= (branch_cond1 	and cond)	or 	(branch_cond2 and cond);
+			bc_var									:= (branch_cond1 	and cond)	or 	(branch_cond2 and cond);
+			
+			if (flout_var = '1') then
+				count := count + 1;
+				if (count = 5) then 
+					cond := '0';
+				end if;
+			else 
+				count := 0;
+				cond  := '1';
+			end if;
+			
+			
+			
+			if(bc_var = '0') then
+				ex_pc_if 		<= UNDEFINED_32;
 			else
-				ex_pc_if 	<= alu_2_out;
+				if (branch_cond1 = '1') then
+					ex_pc_if 	<= alu_1_out;
+				else
+					ex_pc_if 	<= alu_2_out;
+				end if;
 			end if;
 		end if;
 	end process;
@@ -334,36 +374,53 @@ begin
 					out_reg_a2 <= "00000000000000000000000000000000";
 					out_reg_b2 <= "00000000000000000000000000000000";
 					
-					out_index_dst  <= "00000";
-					out_index_dst2 <= "00000";
+					out_index_dst  <= "00000000000000000000000000000000";
+					out_index_dst2 <= "00000000000000000000000000000000";
 				else
+				
 					--Instruction 1
 					if (opcode /= OPCODE_LOAD) and (opcode /= OPCODE_STORE) then
 							--For all instructions except LOAD/STORE
 							out_reg_a <= function_forward_data_to_register1(id_index_a, id_reg_a, mem_record_ex, wb_record_ex);
 							out_reg_b <= function_forward_data_to_register1(id_index_b, id_reg_b, mem_record_ex, wb_record_ex);
-							out_index_dst <= id_index_dst;
-					else
-							--For LOAD/STORE instructions
-							out_reg_a <= id_reg_a;
-							out_reg_b <= id_reg_b;
-							out_index_dst <= function_forward_data_to_register1(id_index_dst, ZERO_27 & id_index_dst, mem_record_ex, wb_record_ex)(4  downto 0);
+							out_index_dst <= ZERO_27 & id_index_dst;
+					elsif  (opcode = OPCODE_LOAD) then
+							--For LOAD instructions
+							out_reg_a <= function_forward_data_to_register1(id_index_a, id_reg_a, mem_record_ex, wb_record_ex);
+							out_reg_b <= UNDEFINED_32;
+							out_index_dst <= function_forward_data_to_register1(id_index_dst, ZERO_27 & id_index_dst, mem_record_ex, wb_record_ex);
+					elsif (opcode = OPCODE_STORE) then
+							--For STORE instruction
+							out_reg_a <= function_forward_data_to_register1(id_index_a, id_reg_a, mem_record_ex, wb_record_ex);
+							out_reg_b <= UNDEFINED_32;							
+							out_index_dst <= function_forward_data_to_register1(id_index_dst, id_reg_dst, mem_record_ex, wb_record_ex);
 					end if;
+					
 					--Instruction 2
 					if (opcode2 /= OPCODE_LOAD) and (opcode2 /= OPCODE_STORE) then
 							--For all instructions except LOAD/STORE					
 							out_reg_a2 <= function_forward_data_to_register2(id_index_a2,  id_reg_a2, mem_record_ex,
 																							 wb_record_ex, id_index_dst, alu_1_out
-																							 );																 
+																							 );
 							out_reg_b2 <= function_forward_data_to_register2(id_index_b2,  id_reg_b2, mem_record_ex, 
 																							 wb_record_ex, id_index_dst, alu_1_out
 																							 );
-							out_index_dst2 <= id_index_dst2;
-					else
-							--For LOAD/STORE instructions
-							out_reg_a2 <= id_reg_a2;
-							out_reg_b2 <= id_reg_b2;
-							out_index_dst2 <= function_forward_data_to_register1(id_index_dst2, ZERO_27 & id_index_dst2, mem_record_ex, wb_record_ex)(4  downto 0);
+							out_index_dst2 <= ZERO_27 & id_index_dst2;
+					elsif (opcode2 = OPCODE_LOAD) then
+							--For LOAD instruction
+							out_reg_a2 <= function_forward_data_to_register2(id_index_a2,  id_reg_a2, mem_record_ex,
+																							 wb_record_ex, id_index_dst, alu_1_out
+																							 );																 
+							out_reg_b2 <= UNDEFINED_32;
+							
+							out_index_dst2 <= function_forward_data_to_register1(id_index_dst2, ZERO_27 & id_index_dst2, mem_record_ex, wb_record_ex);
+					elsif (opcode2 = OPCODE_STORE) then
+							--For STORE instruction
+							out_reg_a2 <= function_forward_data_to_register2(id_index_a2,  id_reg_a2, mem_record_ex,
+																							 wb_record_ex, id_index_dst, alu_1_out
+																							 );												
+							out_reg_b2 <= UNDEFINED_32;
+							out_index_dst2 <= function_forward_data_to_register1(id_index_dst2, id_reg_dst2, mem_record_ex, wb_record_ex);
 					end if;
 				end if;
 			end if;

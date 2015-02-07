@@ -11,6 +11,9 @@
 *.mpf
 *.mpf
 *.rpt
+*.done
+*.summary
+*.vstf
 /db/*
 /output_files/*
 /incremental_db/*

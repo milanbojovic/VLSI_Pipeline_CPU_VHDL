@@ -11,7 +11,7 @@ package cpu_lib is
 	constant REG_WIDTH				: POSITIVE 	:= 32;
 	constant ADDR_WIDTH 				: NATURAL 	:= 32;
 	constant PHASE_DURATION 		: NATURAL 	:= 6;        -- SET PHASE DURATION !!!!!!!!
-	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**8-1;	 --  should be 2**10-1 or more
+	constant INSTR_CACHE_SIZE		: NATURAL 	:= 2**10-1;	 --  should be 2**10-1 or more
 	constant DATA_CACHE_SIZE		: NATURAL 	:= 2**13-1;	 --  should be 2**10-1 or more
 
 	subtype OPCODE_TYPE 			is STD_LOGIC_VECTOR(4 downto 0);
@@ -149,7 +149,7 @@ package body cpu_lib is
 	begin
 		for addr_pos in 0 to 31 loop
 			-- Initialize each address with the address itself
-			tmp(addr_pos) := STD_LOGIC_VECTOR(TO_UNSIGNED(addr_pos, REG_TYPE'length));
+			tmp(addr_pos) := STD_LOGIC_VECTOR(TO_UNSIGNED(addr_pos+1, REG_TYPE'length));
 		end loop;
 		return tmp;
 	end init_regs;

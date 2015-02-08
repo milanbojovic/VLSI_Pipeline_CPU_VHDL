@@ -281,15 +281,15 @@ begin
 					NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 
 				when OPCODE_SL =>
-					result_out := DO_SHIFT_LL(a, b);
+					result_out := DO_SHIFT_LL(b, a);
 					NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 
 				when OPCODE_SR =>
-					result_out := DO_SHIFT_LSR(a, b);
+					result_out := DO_SHIFT_LSR(b, a);
 					NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 
 				when OPCODE_ASR =>
-					result_out := DO_SHIFT_ASR(a, b);
+					result_out := DO_SHIFT_ASR(b, a);
 					NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 
 				when OPCODE_UMOV =>

@@ -2,12 +2,13 @@ library ieee;
 
 use IEEE.STD_LOGIC_1164.all;
 use work.cpu_lib.all;
+use WORK.CPU_PKG.all;
 
 entity CSR is
 	port(
 		-- Input ports 
-		load 						: in STD_LOGIC;
-		reset 					: in STD_LOGIC;
+		record_in_crls 		: in CRLS_RCD;
+		alu1_enable				: in SIGNAL_BIT_TYPE;
 		alu2_enable				: in SIGNAL_BIT_TYPE;
 		
 		n_in 						: in SIGNAL_BIT_TYPE ;
@@ -30,27 +31,27 @@ end entity;
 
 architecture arch of CSR is
 begin
-	process(load, reset, n_in, c_in, v_in, z_in, n_in2, c_in2, v_in2, z_in2) is
+	process(record_in_crls.reset, record_in_crls.clk) is
 	begin
-		if(rising_edge(load)) then
-			if(reset = '1') then
-				n_out <= '0';
+			if (record_in_crls.reset = '0') then
+				if (rising_edge(record_in_crls.clk)) then
+						if (alu1_enable = '1') then 
+							n_out <= n_in;
+							c_out <= c_in;
+							v_out <= v_in;
+							z_out <= z_in;
+						elsif (alu2_enable = '1') then
+							n_out <= n_in2;
+							c_out <= c_in2;
+							v_out <= v_in2;
+							z_out <= z_in2;
+						end if;					
+				end if;
+			else
+			  	n_out <= '0';
 				c_out <= '0';
 				v_out <= '0';
 				z_out <= '0';
-			else
-				if (alu2_enable = '0') then 
-					n_out <= n_in;
-					c_out <= c_in;
-					v_out <= v_in;
-					z_out <= z_in;
-				elsif (alu2_enable = '1') then
-					n_out <= n_in2;
-					c_out <= c_in2;
-					v_out <= v_in2;
-					z_out <= z_in2;
-				end if;
 			end if;
-		end if;
 	end process;
 end architecture;

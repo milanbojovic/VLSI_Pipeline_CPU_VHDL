@@ -149,7 +149,7 @@ package body cpu_lib is
 	begin
 		for addr_pos in 0 to 31 loop
 			-- Initialize each address with the address itself
-			tmp(addr_pos) := STD_LOGIC_VECTOR(TO_UNSIGNED(addr_pos+1, REG_TYPE'length));
+			tmp(addr_pos) := STD_LOGIC_VECTOR(TO_UNSIGNED(addr_pos, REG_TYPE'length));
 		end loop;
 		return tmp;
 	end init_regs;

@@ -47,7 +47,7 @@ begin
 		COMP_MEM_PHASE : entity work.MEM_PHASE(arch) 	port map (record_in_crls, ex_record_mem, wb_record_ex, mem_record_wb, mem_record_ex, sig_mem_record_data_cache, sig_data_cache_record_mem);
 		COMP_WB_PHASE	: entity work.WB_PHASE(arch) 		port map (record_in_crls, mem_record_wb, opcode, wb_record_id, wb_record_ex);
 		
-		COMP_DATA_CACHE: entity work.DATA_CACHE(arch) 	port map (record_in_crls, sig_mem_record_data_cache, mem_record_wb.opcode, sig_data_cache_record_mem);
+		COMP_DATA_CACHE: entity work.DATA_CACHE(arch) 	port map (record_in_crls, sig_mem_record_data_cache, opcode, sig_data_cache_record_mem);
 		COMP_INST_CACHE: entity work.INSTRUCTION_CACHE(arch) 	port map (record_in_crls, sig_if_record_instr_cache, sig_instr_cache_record_if);	
 	
 		

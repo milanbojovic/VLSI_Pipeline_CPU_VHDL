@@ -34,8 +34,8 @@ architecture arch of EX_PHASE is
 	-- REGISTERS
 	
 	--Instruction 1 
-	--signal alu1_enable	: SIGNAL_BIT_TYPE;
-	signal alu2_enable	: SIGNAL_BIT_TYPE;
+	signal alu1_enable	: SIGNAL_BIT_TYPE := '0';
+	signal alu2_enable	: SIGNAL_BIT_TYPE := '0';
 	
 	--Instruction 1
 	signal reg_opcode 				: OPCODE_TYPE;
@@ -147,7 +147,7 @@ begin
 		COMP_MUX_B0 		: entity work.MUX_2_IN_1(arch) 	port map (sig_regB_to_muxB0, sig_regImm_to_muxB0, sig_Imm, sig_muxB0_to_muxB1);
 		COMP_MUX_B1 		: entity work.MUX_2_IN_1(arch) 	port map (sig_muxB0_to_muxB1, sig_regBrOff_to_muxB1, sig_branch_instruction, sig_muxB1_to_aluB);
 		
-		COMP_ALU		 		: entity work.ALU(arch) 			port map (sig_opcode, sig_muxA_to_aluA, sig_muxB1_to_aluB,
+		COMP_ALU		 		: entity work.ALU(arch) 			port map (alu1_enable, sig_opcode, sig_muxA_to_aluA, sig_muxB1_to_aluB,
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
 																						 sig_alu_out,
 																						 sig_csr_negative_in, sig_csr_carry_in, sig_csr_overflow_in, sig_csr_zero_in
@@ -158,13 +158,13 @@ begin
 		COMP_MUX_B20 		: entity work.MUX_2_IN_1(arch) 	port map (sig_regB2_to_muxB20, sig_regImm2_to_muxB20, sig_Imm2, sig_muxB20_to_muxB21);
 		COMP_MUX_B21 		: entity work.MUX_2_IN_1(arch) 	port map (sig_muxB20_to_muxB21, sig_regBrOff2_to_muxB21, sig_branch_instruction2, sig_muxB21_to_aluB2);
 		
-		COMP_ALU2	 		: entity work.ALU(arch) 			port map (sig_opcode2, sig_muxA2_to_aluA2, sig_muxB21_to_aluB2,
+		COMP_ALU2	 		: entity work.ALU(arch) 			port map (alu2_enable, sig_opcode2, sig_muxA2_to_aluA2, sig_muxB21_to_aluB2,
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out,
 																						 sig_alu_out2,
 																						 sig_csr_negative_in2, sig_csr_carry_in2, sig_csr_overflow_in2, sig_csr_zero_in2
 																						);
 
-		COMP_CSR_REG			: entity work.CSR(arch) 		port map (record_in_crls.load, record_in_crls.reset, alu2_enable,
+		COMP_CSR_REG			: entity work.CSR(arch) 		port map (record_in_crls, alu1_enable, alu2_enable,
 																						 sig_csr_negative_in,  sig_csr_carry_in,  sig_csr_overflow_in,  sig_csr_zero_in,
 																						 sig_csr_negative_in2, sig_csr_carry_in2, sig_csr_overflow_in2, sig_csr_zero_in2,
 																						 sig_csr_negative_out, sig_csr_carry_out, sig_csr_overflow_out, sig_csr_zero_out
@@ -218,7 +218,28 @@ begin
 		
 		ex_record_id.flush_out		<= sig_record_control_out.flush_out;
 		
-		
+	
+	process (record_in_crls.clk) 
+	variable counter : INTEGER := 0;
+	begin
+		if (rising_edge(record_in_crls.clk)) then 		
+			if (record_in_crls.load = '1') then 
+				counter := 0;
+			end if;
+			
+			if(counter < PHASE_DURATION/2) then 
+				alu1_enable <= '1';
+				alu2_enable <= '0';
+			else 
+				alu1_enable <= '0';
+				alu2_enable <= '1';			
+			end if;
+			
+			counter := (counter	 + 1) mod PHASE_DURATION;
+			
+		end if;
+	end process;	
+	
 	process (record_in_crls.load, record_in_crls.reset) begin 
 		if (record_in_crls.reset = '0') and (record_in_crls.load = '1') and (sig_record_control_out.flush_out = '0') then 		
 		

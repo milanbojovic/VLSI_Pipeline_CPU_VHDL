@@ -349,7 +349,7 @@ begin
 			negative_out <= negative;
 		else
 			--If ALU is disabled
-			result			<= UNDEFINED_32;
+			--result			<= UNDEFINED_32;
 			NO_EFFECT(carry_in, overflow_in, negative_in, zero_in, carry, negative , zero, overflow);
 		end if;
 	end process;

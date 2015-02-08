@@ -225,7 +225,7 @@ architecture arch of ALU is
 	end NO_EFFECT;
 
 begin
-	process (enable, a, b, opcode, carry_in, zero_in, overflow_in, negative_in)
+	process (enable, a, b, opcode)
 	begin
 		if(enable = '1') then 
 		
